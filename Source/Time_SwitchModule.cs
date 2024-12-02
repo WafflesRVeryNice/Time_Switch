@@ -35,15 +35,17 @@ public class Time_SwitchModule : EverestModule {
 
     private string tpToLevel;
 
-    private int currentLevelNumber;
-
-    private string currentLevelNumberString;
+    private string currentLevelNumber;
 
     private string nextLevelName;
 
     private Vector2 nextLevelPos;
 
     private Vector2 nextPlayerPosRelativeToRoom;
+
+    private LevelData nextPotentialLevel;
+
+    private Level levelToTP;
 
 
     public Time_SwitchModule() {
@@ -72,7 +74,7 @@ public class Time_SwitchModule : EverestModule {
     {
         orig(self);
 
-        if (self.InControl && Time_SwitchModule.Settings.TimeSwitchBind)
+        if (self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
             Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "teleported");
 
@@ -84,6 +86,7 @@ public class Time_SwitchModule : EverestModule {
         }
     }
 
+    
     void TeleportPlayer(Player self)
     {
         Level level = (Level)self.Scene;
@@ -108,32 +111,65 @@ public class Time_SwitchModule : EverestModule {
             tpToLevel = "a";
         }
 
-        currentLevelNumber = currentLevelName[1] + currentLevelName[2];
-        currentLevelNumberString = currentLevelNumber.ToString();
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current room " + currentLevelName);
+
+
+        string currentLevelNumberDigit1 = currentLevelName[1].ToString();
+        string currentLevelNumberDigit2 = currentLevelName[2].ToString();
+        currentLevelNumber = currentLevelNumberDigit1 + currentLevelNumberDigit2;
+
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "num num " + currentLevelNumber);
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "num string " + currentLevelNumber);
 
 
         MapData currentMapData = level.Session.MapData;
 
-        //LevelData nextLevelFirstChar = currentMapData.Levels.Find(item => item.Name[0] == tpToLevel[0]);
+        nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == tpToLevel[0] && item.Name.Contains(currentLevelNumber));
 
-        for (int i = 0; i < currentMapData.LevelCount; i++) 
+        if (level != null)
         {
-            LevelData nextPotentiallevel = currentMapData.Levels.Find(item => item.Name[0] == tpToLevel[0]);
+            nextLevelName = nextPotentialLevel.Name;
 
-            if (nextPotentiallevel.Name.Contains(currentLevelNumberString))
-            {
-                nextLevelName = nextPotentiallevel.Name;
+            Logger.Log(LogLevel.Warn, "Waffles - TimeSwitch", "chosen next level " + nextLevelName);
 
-                nextLevelPos = nextPotentiallevel.LevelOffset;
-            }
+            nextLevelPos = new Vector2(nextPotentialLevel.Bounds.Left, nextPotentialLevel.Bounds.Top);
+
+            //Level levelToTP = ;
+
+            //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next level pos " + nextLevelPos);
         }
 
-        //nextLevelPos = ;
+
 
         nextPlayerPosRelativeToRoom = new Vector2(nextLevelPos.X + playerPosition.X, nextLevelPos.Y + playerPosition.Y);
 
+        //Level levelToTP = currentMapData.Levels.Find(item => item.Name == nextLevelName);
+
         //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, new Vector2(playerPosRelativeToRoom.X, playerPosRelativeToRoom.Y + 800));
-        //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, );
+        //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom);
+        level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom); };
 
     }
+
+    /*
+        for (int i = 0; i < currentMapData.LevelCount; i++) 
+        {
+            nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == tpToLevel[0]);
+
+            //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "potential level " + nextPotentialLevel.Name);
+
+            if (nextPotentialLevel.Name.Contains(currentLevelNumber))
+            {
+                nextLevelName = nextPotentialLevel.Name;
+
+                Logger.Log(LogLevel.Warn, "Waffles - TimeSwitch", "chosen next level " + nextLevelName);
+
+                nextLevelPos = new Vector2(nextPotentialLevel.Bounds.Left, nextPotentialLevel.Bounds.Top);
+
+                Level levelToTP = ;
+
+                //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next level pos " + nextLevelPos);
+            }
+        }
+        */
 }
