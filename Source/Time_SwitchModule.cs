@@ -47,6 +47,10 @@ public class Time_SwitchModule : EverestModule {
 
     private Level levelToTP;
 
+    private int frameCounter = 0;
+
+    private int secondCounter = 0;
+
 
     public Time_SwitchModule() {
         Instance = this;
@@ -79,16 +83,30 @@ public class Time_SwitchModule : EverestModule {
             Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "teleported");
 
             TeleportPlayer(self);
+
+            Time_SwitchModule.Settings.TimeSwitchBind.ConsumeBuffer();
         }
         else
         {
             Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "did not teleport");
         }
+
+        if (frameCounter >= 60)
+        {
+            secondCounter++;
+            Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "-----------------" + secondCounter + "-----------------");
+            frameCounter = 0;
+        }
+        frameCounter++;
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "---" + frameCounter + "---");
     }
 
     
     void TeleportPlayer(Player self)
     {
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "started teleporting player");
+
+
         Level level = (Level)self.Scene;
 
         Player player = level.Tracker.GetEntity<Player>();
@@ -98,6 +116,8 @@ public class Time_SwitchModule : EverestModule {
         currentLevelPos = level.LevelOffset;
 
         playerPosRelativeToLevel = new Vector2(playerPosition.X - currentLevelPos.X, playerPosition.Y - currentLevelPos.Y);
+
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current player pos " + playerPosRelativeToLevel);
 
 
         currentLevelName = level.Session.Level;
@@ -143,11 +163,16 @@ public class Time_SwitchModule : EverestModule {
 
         nextPlayerPosRelativeToRoom = new Vector2(nextLevelPos.X + playerPosition.X, nextLevelPos.Y + playerPosition.Y);
 
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next player pos " + nextPlayerPosRelativeToRoom);
+
         //Level levelToTP = currentMapData.Levels.Find(item => item.Name == nextLevelName);
 
         //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, new Vector2(playerPosRelativeToRoom.X, playerPosRelativeToRoom.Y + 800));
         //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom);
         level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom); };
+
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "finished teleport");
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
 
     }
 
