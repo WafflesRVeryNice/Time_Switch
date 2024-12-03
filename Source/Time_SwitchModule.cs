@@ -84,7 +84,7 @@ public class Time_SwitchModule : EverestModule {
 
             TeleportPlayer(self);
 
-            Time_SwitchModule.Settings.TimeSwitchBind.ConsumeBuffer();
+            Time_SwitchModule.Settings.TimeSwitchBind.ConsumePress();
         }
         else
         {
@@ -167,9 +167,10 @@ public class Time_SwitchModule : EverestModule {
 
         //Level levelToTP = currentMapData.Levels.Find(item => item.Name == nextLevelName);
 
+
         //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, new Vector2(playerPosRelativeToRoom.X, playerPosRelativeToRoom.Y + 800));
         //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom);
-        level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom); };
+        level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosRelativeToRoom); };
 
         Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "finished teleport");
         Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
