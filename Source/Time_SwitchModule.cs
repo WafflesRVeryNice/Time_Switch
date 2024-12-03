@@ -87,6 +87,8 @@ public class Time_SwitchModule : EverestModule {
 
     private void Level_TeleportTo(MonoMod.Cil.ILContext il)
     {
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL started");
+
         ILCursor cursor = new (il);
 
         cursor.GotoNext(MoveType.After, instr => instr.MatchCall<Vector2?>("get_Value"));
