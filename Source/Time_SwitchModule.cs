@@ -91,7 +91,7 @@ public class Time_SwitchModule : EverestModule {
 
         ILCursor cursor = new (il);
 
-        cursor.GotoNext(MoveType.After, instr => instr.MatchCall<Vector2?>("get_Value"));
+        cursor.GotoNext(MoveType.After, instr => instr.MatchLdflda<Session>("RespawnPoint"));
 
         cursor.EmitDelegate(GetPlayerPos);
 
