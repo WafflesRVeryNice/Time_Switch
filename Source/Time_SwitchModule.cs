@@ -93,7 +93,11 @@ public class Time_SwitchModule : EverestModule {
 
         cursor.GotoNext(MoveType.After, instr => instr.MatchLdflda<Session>("RespawnPoint"));
 
+        cursor.Index++;
+
         cursor.EmitDelegate(GetPlayerPos);
+
+        cursor.Index++;
 
         Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context" + cursor.Context);
 
