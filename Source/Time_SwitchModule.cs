@@ -85,7 +85,7 @@ public class Time_SwitchModule : EverestModule {
     }
 
 
-    private void Level_TeleportTo(MonoMod.Cil.ILContext il)
+    private static void Level_TeleportTo(MonoMod.Cil.ILContext il)
     {
         Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL started");
 
@@ -93,27 +93,22 @@ public class Time_SwitchModule : EverestModule {
 
         cursor.GotoNext(MoveType.After, instr => instr.MatchCall<Vector2?>("get_Value"));
 
-        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context" + cursor.Context);
-
         cursor.EmitDelegate(GetPlayerPos);
 
-        modActive = false;
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context" + cursor.Context);
+
+        Time_SwitchModule.Instance.modActive = false;
     }
 
     public static Vector2 GetPlayerPos(Vector2 orig_playerPos)
     {
-
-        Vector2 playerPos;
-
         if (Time_SwitchModule.Instance.modActive)
         {
-            playerPos = Time_SwitchModule.Instance.nextPlayerPosAbsolute;
-            return playerPos;
+            return Time_SwitchModule.Instance.nextPlayerPosAbsolute;
         }
         else
         {
-            playerPos = orig_playerPos;
-            return playerPos;
+            return orig_playerPos;
         }
     }
 
@@ -152,6 +147,7 @@ public class Time_SwitchModule : EverestModule {
     
     void TeleportPlayer(Player self)
     {
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
         Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "started teleporting player");
 
 
