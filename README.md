@@ -1,6 +1,7 @@
-# Time_Switch
+# Time Switch
+###A mod for Celeste Ripping off Titanfall 2
 
-This code mod for Celeste teleport the player between 2 sets of rooms like in Tianfall 2's Effect and Cause where the player is teleported between 2 versions of the map
+This code mod for Celeste teleports the player between 2 sets of rooms like in Tianfall 2's Effect and Cause where the player is teleported between 2 versions of the map
 
 
 This mod took approximately 20.5 hours to make (recorded 20:22:29) over the course of 5 almost consecutive days (took a one day break, after only 4.2 hours in, past me was lazy)
