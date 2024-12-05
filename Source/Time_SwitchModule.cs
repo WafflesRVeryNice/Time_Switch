@@ -8,6 +8,9 @@ using static MonoMod.InlineRT.MonoModRule;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Cil;
+using System.Reflection;
+using MonoMod.RuntimeDetour;
+using MonoMod.Utils;
 
 
 
@@ -75,10 +78,13 @@ public class Time_SwitchModule : EverestModule {
     //used to activate/deactivate the IL hook
     private bool modActive;
 
+    //creates var for manual IL hook
+    private ILHook CancelDashHook;
+
     //---
 
     //this came with the template
-    
+
     public Time_SwitchModule() {
         Instance = this;
 #if DEBUG
@@ -97,15 +103,59 @@ public class Time_SwitchModule : EverestModule {
         On.Celeste.Player.Update += Player_Update;
         //loads IL hook to Level.TeleportTo - inserts this "IL_0000: call Microsoft.Xna.Framework.Vector2 Celeste.Mod.Time_Switch.Time_SwitchModule::GetPlayerPos(Microsoft.Xna.Framework.Vector2)" line under IL_008f
         IL.Celeste.Level.TeleportTo += Level_TeleportTo;
+        //define manual IL hook to Player.orig_Added
+        CancelDashHook = new(typeof(Player).GetMethod("orig_Added", BindingFlags.Public | BindingFlags.Instance), Time_SwitchModule.CancelDashReset);
     }
+
+    
 
     //unloads hooks
     public override void Unload() 
     {
         On.Celeste.Player.Update -= Player_Update;
         IL.Celeste.Level.TeleportTo -= Level_TeleportTo;
+        //manual IL hooks are unloaded a bit differently
+        CancelDashHook.Dispose();
     }
 
+
+
+    private static void CancelDashReset(ILContext il)
+    {
+        //creates IL cursor
+        ILCursor cursor = new(il);
+
+        //places cursor bellow where MatchCallvirt<Player>("get_MaxDashes") - Call virtual (type int32) Celeste.Player :: get_MaxDashes()
+        cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Player>("get_MaxDashes"));
+
+        //cursor writes "ldarg.0"
+        cursor.EmitLdarg0();
+
+        //cursor write delegate
+        cursor.EmitDelegate(GetPlayerDashes);
+
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context CancelDashReset " + cursor.Context);
+
+        //sets modActive false after exicution so it's not still true on the next frame
+        //Time_SwitchModule.Instance. is added before modActive because this method is static so you have to specifiy the instance you want
+        Time_SwitchModule.Instance.modActive = false;
+    }
+
+
+    private static int GetPlayerDashes(int MaxDashes, Player player)
+    {
+        //if statement checks whether the modded code should trigger or it it should use the vanilla version
+        if (Time_SwitchModule.Instance.modActive)
+        {
+            //how many dash th eplayer currentlt has
+            return player.Dashes;
+        }
+        else
+        {
+            //number of possible dashes (inventory)
+            return MaxDashes;
+        }
+    }
 
 
     private static void Level_TeleportTo(MonoMod.Cil.ILContext il)
@@ -122,17 +172,16 @@ public class Time_SwitchModule : EverestModule {
         //moves the cursor one line down
         cursor.Index++;
 
-        //cursor 'prints' the delegate
+        //cursor writes the delegate
         cursor.EmitDelegate(GetPlayerPos);
 
         //moves the cursor one line down again so it can continue
         cursor.Index++;
 
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context" + cursor.Context);
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context Level_Teleport " + cursor.Context);
 
         //sets modActive false after exicution so it's not still true on the next frame
         //Time_SwitchModule.Instance. is added before modActive because this method is static so you have to specifiy the instance you want
-        Time_SwitchModule.Instance.modActive = false;
     }
 
     public static Vector2 GetPlayerPos(Vector2 orig_playerPos)
@@ -140,10 +189,12 @@ public class Time_SwitchModule : EverestModule {
         //if statement checks whether the modded code should trigger or it it should use the vanilla version
         if (Time_SwitchModule.Instance.modActive)
         {
+            //spawns player at the excact position defined in Teleport_Player
             return Time_SwitchModule.Instance.nextPlayerPosAbsolute;
         }
         else
         {
+            //causes vanilla behaviour - player spawns at the nearest spawn point
             return orig_playerPos;
         }
     }
