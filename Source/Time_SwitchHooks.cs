@@ -28,10 +28,7 @@ public static class Time_SwitchHooks {
     //gets the 'scene' scene can be MainMenu, Level etc - it's kind of like the camera
     public static Scene Scene { get; private set; }
 
-    //name of the room the player should teleport to
     private static string nextLevelName;
-
-    //the position of the room the player should teleport to
     private static Vector2 nextLevelPos;
 
     //list of rooms that begin with the character in tpToLevel
@@ -39,12 +36,6 @@ public static class Time_SwitchHooks {
 
     //the position in world space the player should teleport to (uses "Absolute" sufix due to the now remove variable "nextPlayerPosRelativeToRoom")
     private static Vector2 nextPlayerPosAbsolute;
-
-    //frame counter used for debugging
-    //private int frameCounter = 0;
-
-    //second sounter used for debugging
-    //private int secondCounter = 0;
 
     //used to activate/deactivate the IL hook
     private static bool modActive;
@@ -92,10 +83,7 @@ public static class Time_SwitchHooks {
         //cursor write delegate
         cursor.EmitDelegate(GetPlayerDashes);
 
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context CancelDashReset " + cursor.Context);
-
         //sets modActive false after exicution so it's not still true on the next frame
-        //Time_SwitchModule.Instance. is added before modActive because this method is static so you have to specifiy the instance you want
         Time_SwitchHooks.modActive = false;
     }
 
@@ -118,8 +106,6 @@ public static class Time_SwitchHooks {
 
     private static void Level_TeleportTo(MonoMod.Cil.ILContext il)
     {
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL started");
-
         //creates new IL cursor
         ILCursor cursor = new (il);
 
@@ -135,11 +121,6 @@ public static class Time_SwitchHooks {
 
         //moves the cursor one line down again so it can continue
         cursor.Index++;
-
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "IL context Level_Teleport " + cursor.Context);
-
-        //sets modActive false after exicution so it's not still true on the next frame
-        //Time_SwitchModule.Instance. is added before modActive because this method is static so you have to specifiy the instance you want
     }
 
     public static Vector2 GetPlayerPos(Vector2 orig_playerPos)
@@ -170,8 +151,6 @@ public static class Time_SwitchHooks {
             //activates IL
             modActive = true;
 
-            //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "teleported");
-
             //calls seperate method that actually handles the teleportation
             TeleportPlayer(self);
 
@@ -182,30 +161,12 @@ public static class Time_SwitchHooks {
         {
             //deactivates IL hook (only required on the first frame, safety after that)
             modActive = false;
-
-            //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "did not teleport");
         }
-
-        //counter for debugging to see on what frame(s) something happens
-        //assumes the frame rate is 60 because Celeste updates phystics 60 times a seconds
-        /*
-        if (frameCounter >= 60)
-        {
-            secondCounter++;
-            Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "-----------------" + secondCounter + "-----------------");
-            frameCounter = 0;
-        }
-        frameCounter++;
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "---" + frameCounter + "---");
-        */
     }
 
     
     static void TeleportPlayer(Player self)
     {
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "started teleporting player");
-
         //Level is the current room (where the scene is), alternatives to "(Level)self.Scene" are "Scene as Level" and "SceneAs<Level>()"
         Level level = (Level)self.Scene;
 
@@ -215,21 +176,14 @@ public static class Time_SwitchHooks {
         //player's position in world space measured in pixels
         Vector2 playerPosition = player.Position;
 
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current player pos" + playerPosition);
-
-
         //the position of the current room (position is at the top-left of the room) (room positions are also in pixels)
         Vector2 currentLevelPos = level.LevelOffset;
 
         //finds difference between the player's position and the level's positions (note that -Y is up and +Y is down)
         Vector2 playerPosRelativeToLevel = new Vector2(playerPosition.X - currentLevelPos.X, playerPosition.Y - currentLevelPos.Y);
 
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current relative player pos " + playerPosRelativeToLevel);
-
         //gets the name of the room the player is in
         string currentLevelName = level.Session.Level;
-
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current room " + currentLevelName);
 
         //new comment
         string nextLevelTimeline = TimelinePicker(currentLevelName);
@@ -237,33 +191,14 @@ public static class Time_SwitchHooks {
         //new comment
         string currentLevelNumber = FetchCurrentLevelIdentifier(currentLevelName);
 
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "room number " + currentLevelNumber);
+        FindNextLevel(level, nextLevelTimeline, currentLevelNumber);
 
-        //string nextLevelName = null;
-        //Vector2? nextLevelPos = null;
-
-        (string nextLevelName, Vector2? nextLevelPos) nextLevel = (nextLevelName, nextLevelPos);
-
-        nextLevel = FindNextLevel(level, nextLevelTimeline, currentLevelNumber);
-
-        nextLevelName = nextLevel.nextLevelName;
-        Vector2? nextLevelPosNullable = nextLevel.nextLevelPos;
-
-        if (nextLevelPosNullable != null)
-        {
-            //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
-            nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
-        }
-
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next player pos " + nextPlayerPosAbsolute);
+        //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
+        nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
 
         //at the end of the frame it teleports the player to the new room at the new player position
         //note that the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
         level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
-
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "finished teleport");
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
-
     }
 
 
@@ -299,7 +234,7 @@ public static class Time_SwitchHooks {
 
 
 
-    static (string nextLevelName, Vector2? nextLevelPos) FindNextLevel(Level level, string nextLevelTimeline, string currentLevelNumber)
+    static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelNumber)
     {
         //MapData is a list of LevelData including all rooms in the map
         MapData currentMapData = level.Session.MapData;
@@ -313,19 +248,8 @@ public static class Time_SwitchHooks {
             //gets the name of the room to teleport to from the LevelData 
             nextLevelName = nextPotentialLevel.Name;
 
-            //Logger.Log(LogLevel.Warn, "Waffles - TimeSwitch", "chosen next level " + nextLevelName);
-
             //gets the position of the rrom to teleport to (Bounds.Left is the X value of the left side of the room, Bounds.Top is the Y value of the top of the rooms)
             nextLevelPos = new Vector2(nextPotentialLevel.Bounds.Left, nextPotentialLevel.Bounds.Top);
-            Vector2? nextLevelPosNullable = (Vector2?)nextLevelPos;
-
-            //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next level pos " + nextLevelPos);
-
-            return (nextLevelName, nextLevelPosNullable);
-        }
-        else
-        {
-            return (null, null);
         }
     }
 }
