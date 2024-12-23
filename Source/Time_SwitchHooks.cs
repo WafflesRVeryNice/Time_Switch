@@ -25,26 +25,8 @@ public static class Time_SwitchHooks {
 
     //---vars---
 
-    //player's position in world space measured in pixels
-    private static Vector2 playerPosition;
-
     //gets the 'scene' scene can be MainMenu, Level etc - it's kind of like the camera
     public static Scene Scene { get; private set; }
-
-    //the position of the current room (position is at the top-left of the room) (room positions are also in pixels)
-    private static Vector2 currentLevelPos;
-
-    //result of simple calculation to find difference between player's position and room's position
-    private static Vector2 playerPosRelativeToLevel;
-
-    //the name of the current room
-    private static string currentLevelName;
-
-    //first character of the room' name (assumes room name format as stated in ReadMe)
-    private static string tpToLevel;
-
-    //second and third character of the room's name (assumes room name format as stated in ReadMe)
-    private static string currentLevelNumber;
 
     //name of the room the player should teleport to
     private static string nextLevelName;
@@ -229,49 +211,91 @@ public static class Time_SwitchHooks {
 
         //finds the player
         Player player = level.Tracker.GetEntity<Player>();
-        //sets playerPosition to the current position of the player
-        playerPosition = player.Position;
+
+        //player's position in world space measured in pixels
+        Vector2 playerPosition = player.Position;
 
         //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current player pos" + playerPosition);
 
 
-        //sets currentlevelPos to the position of the current room
-        currentLevelPos = level.LevelOffset;
+        //the position of the current room (position is at the top-left of the room) (room positions are also in pixels)
+        Vector2 currentLevelPos = level.LevelOffset;
 
         //finds difference between the player's position and the level's positions (note that -Y is up and +Y is down)
-        playerPosRelativeToLevel = new Vector2(playerPosition.X - currentLevelPos.X, playerPosition.Y - currentLevelPos.Y);
+        Vector2 playerPosRelativeToLevel = new Vector2(playerPosition.X - currentLevelPos.X, playerPosition.Y - currentLevelPos.Y);
 
         //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current relative player pos " + playerPosRelativeToLevel);
 
         //gets the name of the room the player is in
-        currentLevelName = level.Session.Level;
-
-        //checks the first character of the room's name and outputs 'the opposite'
-        if (currentLevelName.StartsWith("a"))
-        {
-            tpToLevel = "b";
-        }
-        else if (currentLevelName.StartsWith("b"))
-        {
-            tpToLevel = "a";
-        }
+        string currentLevelName = level.Session.Level;
 
         //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "current room " + currentLevelName);
 
+        //new comment
+        string nextLevelTimeline = TimelinePicker(currentLevelName);
+
+        //new comment
+        string currentLevelNumber = FetchCurrentLevelIdentifier(currentLevelName);
+
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "room number " + currentLevelNumber);
+
+        //new comment
+        FindNextLevel(level, nextLevelTimeline, currentLevelNumber);
+
+        //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
+        nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
+
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next player pos " + nextPlayerPosAbsolute);
+
+        //at the end of the frame it teleports the player to the new room at the new player position
+        //note that the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
+        level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
+
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "finished teleport");
+        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
+
+    }
+
+
+
+    static string TimelinePicker(string currentLevelName)
+    {
+        //return the character used for the other timeline
+        if (currentLevelName.StartsWith("a"))
+        {
+            return "b";
+        }
+        else if (currentLevelName.StartsWith("b"))
+        {
+            return "a";
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+
+
+    static string FetchCurrentLevelIdentifier(string currentLevelName)
+    {
         //gets the second and third characters of the current room's name
         string currentLevelNumberDigit1 = currentLevelName[1].ToString();
         string currentLevelNumberDigit2 = currentLevelName[2].ToString();
 
         //adds them to a single string
-        currentLevelNumber = currentLevelNumberDigit1 + currentLevelNumberDigit2;
+        return currentLevelNumberDigit1 + currentLevelNumberDigit2;
+    }
 
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "room number " + currentLevelNumber);
 
+
+    static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelNumber)
+    {
         //MapData is a list of LevelData including all rooms in the map
         MapData currentMapData = level.Session.MapData;
 
         //finds the LevelData for the room that has the correct first character and contains the currentLevelNumber string (characters 2 & 3)
-        nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == tpToLevel[0] && item.Name.Contains(currentLevelNumber));
+        nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == nextLevelTimeline[0] && item.Name.Contains(currentLevelNumber));
 
         //safety if statement
         if (level != null)
@@ -286,22 +310,5 @@ public static class Time_SwitchHooks {
 
             //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next level pos " + nextLevelPos);
         }
-
-        //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
-        nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
-
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next player pos " + nextPlayerPosAbsolute);
-
-        //relics of the past
-        //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, new Vector2(playerPosRelativeToRoom.X, playerPosRelativeToRoom.Y + 800));
-        //Level.TeleportTo(self, nextLevelName, Player.IntroTypes.None, nextPlayerPosRelativeToRoom);
-
-        //at the end of the frame it teleports the player to the new room at the new player position
-        //note that the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
-        level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
-
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "finished teleport");
-        //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "----------------------------------");
-
     }
 }
