@@ -239,11 +239,21 @@ public static class Time_SwitchHooks {
 
         //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "room number " + currentLevelNumber);
 
-        //new comment
-        FindNextLevel(level, nextLevelTimeline, currentLevelNumber);
+        //string nextLevelName = null;
+        //Vector2? nextLevelPos = null;
 
-        //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
-        nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
+        (string nextLevelName, Vector2? nextLevelPos) nextLevel = (nextLevelName, nextLevelPos);
+
+        nextLevel = FindNextLevel(level, nextLevelTimeline, currentLevelNumber);
+
+        nextLevelName = nextLevel.nextLevelName;
+        Vector2? nextLevelPosNullable = nextLevel.nextLevelPos;
+
+        if (nextLevelPosNullable != null)
+        {
+            //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
+            nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
+        }
 
         //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next player pos " + nextPlayerPosAbsolute);
 
@@ -289,7 +299,7 @@ public static class Time_SwitchHooks {
 
 
 
-    static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelNumber)
+    static (string nextLevelName, Vector2? nextLevelPos) FindNextLevel(Level level, string nextLevelTimeline, string currentLevelNumber)
     {
         //MapData is a list of LevelData including all rooms in the map
         MapData currentMapData = level.Session.MapData;
@@ -307,8 +317,15 @@ public static class Time_SwitchHooks {
 
             //gets the position of the rrom to teleport to (Bounds.Left is the X value of the left side of the room, Bounds.Top is the Y value of the top of the rooms)
             nextLevelPos = new Vector2(nextPotentialLevel.Bounds.Left, nextPotentialLevel.Bounds.Top);
+            Vector2? nextLevelPosNullable = (Vector2?)nextLevelPos;
 
             //Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "next level pos " + nextLevelPos);
+
+            return (nextLevelName, nextLevelPosNullable);
+        }
+        else
+        {
+            return (null, null);
         }
     }
 }
