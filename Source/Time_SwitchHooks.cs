@@ -28,20 +28,20 @@ public static class Time_SwitchHooks {
     //gets the 'scene' scene can be MainMenu, Level etc - it's kind of like the camera
     public static Scene Scene { get; private set; }
 
+    //name of room to teleport to as string
     private static string nextLevelName;
-    private static Vector2 nextLevelPos;
 
-    //list of rooms that begin with the character in tpToLevel
-    private static LevelData nextPotentialLevel;
+    //position of room to teleport to as vector 2
+    private static Vector2 nextLevelPos;
 
     //the position in world space the player should teleport to (uses "Absolute" sufix due to the now remove variable "nextPlayerPosRelativeToRoom")
     private static Vector2 nextPlayerPosAbsolute;
 
     //used to activate/deactivate the IL hook
-    private static bool modActive;
+    private static bool positionCorrectionILActive;
 
     //creates var for manual IL hook
-    private static ILHook CancelDashHook;
+    private static ILHook CancelDashRefillHook;
 
     //---
     
@@ -53,7 +53,7 @@ public static class Time_SwitchHooks {
         //loads IL hook to Level.TeleportTo - inserts this "IL_0000: call Microsoft.Xna.Framework.Vector2 Celeste.Mod.Time_Switch.Time_SwitchModule::GetPlayerPos(Microsoft.Xna.Framework.Vector2)" line under IL_008f
         IL.Celeste.Level.TeleportTo += Level_TeleportTo;
         //define manual IL hook to Player.orig_Added
-        CancelDashHook = new(typeof(Player).GetMethod("orig_Added", BindingFlags.Public | BindingFlags.Instance), Time_SwitchHooks.CancelDashReset);
+        CancelDashRefillHook = new(typeof(Player).GetMethod("orig_Added", BindingFlags.Public | BindingFlags.Instance), Time_SwitchHooks.CancelDashReset);
     }
 
     
@@ -64,8 +64,10 @@ public static class Time_SwitchHooks {
         On.Celeste.Player.Update -= Player_Update;
         IL.Celeste.Level.TeleportTo -= Level_TeleportTo;
         //manual IL hooks are unloaded a bit differently
-        CancelDashHook.Dispose();
+        CancelDashRefillHook.Dispose();
     }
+
+
 
 
 
@@ -84,16 +86,17 @@ public static class Time_SwitchHooks {
         cursor.EmitDelegate(GetPlayerDashes);
 
         //sets modActive false after exicution so it's not still true on the next frame
-        Time_SwitchHooks.modActive = false;
+        Time_SwitchHooks.positionCorrectionILActive = false;
     }
+
 
 
     private static int GetPlayerDashes(int MaxDashes, Player player)
     {
         //if statement checks whether the modded code should trigger or it it should use the vanilla version
-        if (Time_SwitchHooks.modActive)
+        if (Time_SwitchHooks.positionCorrectionILActive)
         {
-            //how many dash th eplayer currentlt has
+            //how many dashes the player currently has
             return player.Dashes;
         }
         else
@@ -102,6 +105,9 @@ public static class Time_SwitchHooks {
             return MaxDashes;
         }
     }
+
+
+
 
 
     private static void Level_TeleportTo(MonoMod.Cil.ILContext il)
@@ -123,10 +129,12 @@ public static class Time_SwitchHooks {
         cursor.Index++;
     }
 
+
+
     public static Vector2 GetPlayerPos(Vector2 orig_playerPos)
     {
         //if statement checks whether the modded code should trigger or it it should use the vanilla version
-        if (Time_SwitchHooks.modActive)
+        if (Time_SwitchHooks.positionCorrectionILActive)
         {
             //spawns player at the excact position defined in Teleport_Player
             return Time_SwitchHooks.nextPlayerPosAbsolute;
@@ -140,6 +148,8 @@ public static class Time_SwitchHooks {
 
 
 
+
+
     private static void Player_Update(On.Celeste.Player.orig_Update orig, Player self)
     {
         //this calls the original Update (which calls orig_Update - the actual vanilla update hooking Update instead of orig_Update is 'safer')
@@ -149,7 +159,7 @@ public static class Time_SwitchHooks {
         if (self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
             //activates IL
-            modActive = true;
+            positionCorrectionILActive = true;
 
             //calls seperate method that actually handles the teleportation
             TeleportPlayer(self);
@@ -160,9 +170,10 @@ public static class Time_SwitchHooks {
         else
         {
             //deactivates IL hook (only required on the first frame, safety after that)
-            modActive = false;
+            positionCorrectionILActive = false;
         }
     }
+
 
     
     static void TeleportPlayer(Player self)
@@ -185,13 +196,14 @@ public static class Time_SwitchHooks {
         //gets the name of the room the player is in
         string currentLevelName = level.Session.Level;
 
-        //new comment
+        //selects which timeline the player should teleport to
         string nextLevelTimeline = TimelinePicker(currentLevelName);
 
-        //new comment
-        string currentLevelNumber = FetchCurrentLevelIdentifier(currentLevelName);
+        //finds the identifier of the room the player is currently in
+        string currentLevelIdentifier = FetchCurrentLevelIdentifier(currentLevelName);
 
-        FindNextLevel(level, nextLevelTimeline, currentLevelNumber);
+        //finds room on the other timeline with the same identifier as the one the player is currently in
+        FindNextLevel(level, nextLevelTimeline, currentLevelIdentifier);
 
         //uses position of room to teleport to + the difference between the player and the position of the room the player is in to set the position the player should teleport to
         nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
@@ -234,13 +246,13 @@ public static class Time_SwitchHooks {
 
 
 
-    static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelNumber)
+    static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelIdentifier)
     {
         //MapData is a list of LevelData including all rooms in the map
         MapData currentMapData = level.Session.MapData;
 
         //finds the LevelData for the room that has the correct first character and contains the currentLevelNumber string (characters 2 & 3)
-        nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == nextLevelTimeline[0] && item.Name.Contains(currentLevelNumber));
+        LevelData nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == nextLevelTimeline[0] && item.Name.Contains(currentLevelIdentifier));
 
         //safety if statement
         if (level != null)
