@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using static Celeste.Mod.Time_Switch.Time_SwitchModule;
 
 namespace Celeste.Mod.Time_Switch;
 
@@ -15,34 +16,29 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
 
 
-    //---on/off + room name format setting---
-    public int RoomNameFormat { get; set; } = 0;
+    public Time_Switch.FormatMode RoomNameFormat { get; set; } = Time_Switch.FormatMode.off;
 
+    //---on/off + room name format setting---
     public void CreateRoomNameFormatEntry(TextMenu menu, bool inGame)
     {
-        string roomNameFormatSubtext = "error - description not set";
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat setting before index: " + Time_Switch.RoomNameFormat);
 
-        int selected = 0;
+        //+++solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Core/CoreModuleSettings.cs#L559
 
-        //+++solution from xaphan helper+++ https://github.com/Xaphan67/XaphanHelper/blob/dev/Code/XaphanModuleSettings.cs#L40
-        TextMenu.Slider roomNameFormatSlider = (TextMenu.Slider)new TextMenu.Slider(label: Dialog.Clean("Setting_RoomNameFormat_Name"), (int selected) => selected switch
-        {
-            0 => Dialog.Clean("Setting_RoomNameFormat_Option_0"),
-            1 => Dialog.Clean("Setting_RoomNameFormat_Option_1"),
-            _ => Dialog.Clean("Setting_RoomNameFormat_Option_2"),
-        }
-        , 0, 2, RoomNameFormat)
-            .Change(delegate {RoomNameFormat = selected;} );
-        //+++
+        TextMenu.Slider roomNameFormatSlider = (TextMenu.Slider)new TextMenu.Slider(label: Dialog.Clean("Setting_RoomNameFormat_Name"), 
+            i => Dialog.Clean($"Setting_RoomNameFormat_Option_{Enum.GetName((Time_Switch.FormatMode) i)}"), 
+            0, Enum.GetValues<Time_Switch.FormatMode>().Length - 1, (int)RoomNameFormat);
 
-        roomNameFormatSlider.OnValueChange += val => roomNameFormatOption = (Time_SwitchModuleSettings.RoomNameFormatOptions)val;
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat setting after index: " + Time_Switch.RoomNameFormat);
 
-        roomNameFormatSubtext = $"Setting_RoomNameFormat_Description_{selected}";
+        roomNameFormatSlider.OnValueChange += val => RoomNameFormat = (Time_Switch.FormatMode)val;
+
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat setting after val => RoomNameFormat = (Time_Switch.FormatMode)val: " + Time_Switch.RoomNameFormat);
 
         menu.Add(roomNameFormatSlider);
 
-        //+++solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Core/CoreModuleSettings.cs#L559
-        TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Setting_RoomNameFormat_Description_{Enum.GetName(roomNameFormatOption)}"), false, menu)
+        
+        TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Setting_RoomNameFormat_Description_{Enum.GetName(RoomNameFormat)}"), false, menu)
         {
             TextColor = Color.Gray,
             HeightExtra = 0f
@@ -55,23 +51,9 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
         roomNameFormatSlider.OnEnter += () => descrText.FadeVisible = true;
         roomNameFormatSlider.OnLeave += () => descrText.FadeVisible = false;
         roomNameFormatSlider.OnValueChange += val => {
-            descrText.Title = Dialog.Clean($"Setting_RoomNameFormat_Description_{Enum.GetName((Time_SwitchModuleSettings.RoomNameFormatOptions)val)}");
+            descrText.Title = Dialog.Clean($"Setting_RoomNameFormat_Description_{Enum.GetName((Time_Switch.FormatMode)val)}");
             menu.RecalculateSize();
         };
         //+++
     }
-
-
-
-    Time_SwitchModuleSettings.RoomNameFormatOptions roomNameFormatOption { get; set; }
-
-    public enum RoomNameFormatOptions
-    {
-        off,
-        Format1,
-        Format2
-    }
-
-    //---
-
 }

@@ -3,9 +3,9 @@ bin_Time_Switch= Time Switch
 
 Setting_RoomNameFormat_Name= Enabled
 
-Setting_RoomNameFormat_Option_0= off
-Setting_RoomNameFormat_Option_1= simple
-Setting_RoomNameFormat_Option_2= clean
+Setting_RoomNameFormat_Option_off= off
+Setting_RoomNameFormat_Option_Format1= simple
+Setting_RoomNameFormat_Option_Format2= clean
 
 Setting_RoomNameFormat_Description_off= not active - check gamebanana or github page for detailed info on room name formats
 Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)

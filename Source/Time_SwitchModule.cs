@@ -11,6 +11,7 @@ using MonoMod.Cil;
 using System.Reflection;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
+using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings;
 
 
 
@@ -22,7 +23,8 @@ namespace Celeste.Mod.Time_Switch;
 
 public class Time_SwitchModule : EverestModule
 {
-    //---Setting up mod (from mod template)---
+    //+++Mod Template+++ https://github.com/EverestAPI/CelesteModTemplate/blob/main/CelesteMod/Source/CelesteModModule.cs
+    //---Setting up mod---
     public static Time_SwitchModule Instance { get; private set; }
 
     public override Type SettingsType => typeof(Time_SwitchModuleSettings);
@@ -38,7 +40,6 @@ public class Time_SwitchModule : EverestModule
 
 
     //---assigning the instance---
-
     public Time_SwitchModule()
     {
         Instance = this;
@@ -48,8 +49,6 @@ public class Time_SwitchModule : EverestModule
 
 #endif
     }
-
-    //---
 
 
 

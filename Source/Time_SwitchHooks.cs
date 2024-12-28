@@ -11,6 +11,7 @@ using MonoMod.Cil;
 using System.Reflection;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
+using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings;
 
 
 
@@ -19,7 +20,7 @@ namespace Celeste.Mod.Time_Switch;
 public static class Time_SwitchHooks {
 
 
-    //---Class-wide vars---
+    //---Class-wide vars--- 
 
     //scene is what is currently being displayed (menu, level, etc)
     public static Scene Scene { get; private set; }
@@ -38,7 +39,7 @@ public static class Time_SwitchHooks {
     private static ILHook CancelDashRefillHook;
 
     //---
-    
+
 
 
     internal static void Load() 
@@ -132,8 +133,13 @@ public static class Time_SwitchHooks {
         //calls Update
         orig(self);
 
-        if (self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
+        //string formatCheck = Enum.GetName(Time_SwitchModuleSettings.RoomNameFormat);
+        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat: " + Time_Switch.RoomNameFormat);
+
+        if (Time_Switch.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
+            Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "Teleport triggered");
+
             //activates ILs
             correctionILsActive = true;
 
