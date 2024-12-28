@@ -5,11 +5,8 @@ Setting_RoomNameFormat_Name= Enabled
 
 Setting_RoomNameFormat_Option_0= off
 Setting_RoomNameFormat_Option_1= simple
-Setting_RoomNameFormat_Option_2= better
+Setting_RoomNameFormat_Option_2= clean
 
 Setting_RoomNameFormat_Description_off= not active - check gamebanana or github page for detailed info on room name formats
 Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)
-Setting_RoomNameFormat_Description_Format2= uses format (stylegrounds)(identifier)(name)(timeline)
-
-Setting_RoomNameFormat_Description_add_3= (pending review) uses format (stylegrounds)(identifier)(timeline)(name)
-Setting_RoomNameFormat_Description_replace_2= (pending review) uses format (identifier)(stylegrounds)(name)(timeline)
+Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timeline)

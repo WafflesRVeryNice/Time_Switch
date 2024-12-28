@@ -3,15 +3,11 @@ using System;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
-//using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings.RoomNameFormat;
 
 namespace Celeste.Mod.Time_Switch;
 
 public class Time_SwitchModuleSettings : EverestModuleSettings
 {
-
-    //TextMenu TimeSwitchMenu { get; set; }
-
     //---Time Switch Keybind---
     [DefaultButtonBinding(button: Buttons.Y, key: Keys.Q)]
     public ButtonBinding TimeSwitchBind { get; set; }
@@ -24,10 +20,11 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
     public void CreateRoomNameFormatEntry(TextMenu menu, bool inGame)
     {
-        string roomNameFormatSubtext = "aaaaaa";
+        string roomNameFormatSubtext = "error - description not set";
 
         int selected = 0;
 
+        //+++solution from xaphan helper+++ https://github.com/Xaphan67/XaphanHelper/blob/dev/Code/XaphanModuleSettings.cs#L40
         TextMenu.Slider roomNameFormatSlider = (TextMenu.Slider)new TextMenu.Slider(label: Dialog.Clean("Setting_RoomNameFormat_Name"), (int selected) => selected switch
         {
             0 => Dialog.Clean("Setting_RoomNameFormat_Option_0"),
@@ -36,6 +33,7 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
         }
         , 0, 2, RoomNameFormat)
             .Change(delegate {RoomNameFormat = selected;} );
+        //+++
 
         roomNameFormatSlider.OnValueChange += val => roomNameFormatOption = (Time_SwitchModuleSettings.RoomNameFormatOptions)val;
 
@@ -43,6 +41,7 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
         menu.Add(roomNameFormatSlider);
 
+        //+++solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Core/CoreModuleSettings.cs#L559
         TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Setting_RoomNameFormat_Description_{Enum.GetName(roomNameFormatOption)}"), false, menu)
         {
             TextColor = Color.Gray,
@@ -57,9 +56,9 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
         roomNameFormatSlider.OnLeave += () => descrText.FadeVisible = false;
         roomNameFormatSlider.OnValueChange += val => {
             descrText.Title = Dialog.Clean($"Setting_RoomNameFormat_Description_{Enum.GetName((Time_SwitchModuleSettings.RoomNameFormatOptions)val)}");
-            //descrText.IncludeWidthInMeasurement = false;
             menu.RecalculateSize();
         };
+        //+++
     }
 
 
