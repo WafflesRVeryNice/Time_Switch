@@ -14,12 +14,12 @@ using MonoMod.Utils;
 using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings;
 
 
-
+//+++Solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Everest/Everest.cs#L957
 namespace Celeste.Mod.Time_Switch;
 
 public static partial class Time_Switch
 {
-
+    //+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Everest/Everest.cs#L115
     public static FormatMode RoomNameFormat { get; internal set; }
 
     public enum FormatMode
@@ -29,4 +29,4 @@ public static partial class Time_Switch
         Format2
     }
 }
-
+//+++

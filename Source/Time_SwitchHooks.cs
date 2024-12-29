@@ -187,31 +187,58 @@ public static class Time_SwitchHooks {
     }
 
 
+    //returns the character used for the other timeline
     static string TimelinePicker(string currentLevelName)
     {
-        //returns the character used for the other timeline
-        if (currentLevelName.StartsWith("a"))
+        Time_Switch.FormatMode format = Time_SwitchModule.Settings.RoomNameFormat;
+
+        //TODO add support for any unicode characters
+
+        if (format == Time_Switch.FormatMode.Format1)
         {
-            return "b";
-        }
-        else if (currentLevelName.StartsWith("b"))
-        {
-            return "a";
-        }
-        else
-        {
+            if (currentLevelName.StartsWith("a"))
+            {
+                return "b";
+            }
+            else if (currentLevelName.StartsWith("b"))
+            {
+                return "a";
+            }
             return null;
         }
+
+        if (format == Time_Switch.FormatMode.Format2)
+        {
+            if (currentLevelName.EndsWith("a"))
+            {
+                return "b";
+            }
+            else if (currentLevelName.EndsWith("b"))
+            {
+                return "a";
+            }
+            return null;
+        }
+
+        return null;
     }
 
 
     static string FetchCurrentLevelIdentifier(string currentLevelName)
     {
+        //if the "clean" format is used it reads the first character as well
+        string currentLevelNumberDigit0 = string.Empty;
+
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
+        {
+            currentLevelNumberDigit0 = currentLevelName[0].ToString();
+        }
+
         string currentLevelNumberDigit1 = currentLevelName[1].ToString();
         string currentLevelNumberDigit2 = currentLevelName[2].ToString();
 
         //adds characters to a single string
-        return currentLevelNumberDigit1 + currentLevelNumberDigit2;
+        return currentLevelNumberDigit0 + currentLevelNumberDigit1 + currentLevelNumberDigit2;
     }
 
 
@@ -220,10 +247,21 @@ public static class Time_SwitchHooks {
         //MapData is a list of LevelData of all rooms in the map
         MapData currentMapData = level.Session.MapData;
 
-        //finds the LevelData for the room that has the correct first character and contains the identifier
-        LevelData nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == nextLevelTimeline[0] && item.Name.Contains(currentLevelIdentifier)); //TODO check only the idenifier string for matching indentifier
+        LevelData nextPotentialLevel = null;
 
-        if (level != null) //unsure if necessary
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1)
+        {
+            //finds the LevelData for the room that has the correct first character and same identifier
+            nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == nextLevelTimeline[0] && item.Name[1..3] == currentLevelIdentifier);
+        }
+
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
+        {
+            //finds the LevelData for the room that has the correct last character and same identifier
+            nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[^1] == nextLevelTimeline[0] && item.Name[0..3] == currentLevelIdentifier);
+        }
+
+        if (nextPotentialLevel != null)
         {
             nextLevelName = nextPotentialLevel.Name;
 
