@@ -21,19 +21,13 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
     //---on/off + room name format setting---
     public void CreateRoomNameFormatEntry(TextMenu menu, bool inGame)
     {
-        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat setting before index: " + Time_Switch.RoomNameFormat);
-
         //+++solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Core/CoreModuleSettings.cs#L559
 
         TextMenu.Slider roomNameFormatSlider = (TextMenu.Slider)new TextMenu.Slider(label: Dialog.Clean("Setting_RoomNameFormat_Name"), 
             i => Dialog.Clean($"Setting_RoomNameFormat_Option_{Enum.GetName((Time_Switch.FormatMode) i)}"), 
             0, Enum.GetValues<Time_Switch.FormatMode>().Length - 1, (int)RoomNameFormat);
 
-        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat setting after index: " + Time_Switch.RoomNameFormat);
-
         roomNameFormatSlider.OnValueChange += val => RoomNameFormat = (Time_Switch.FormatMode)val;
-
-        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat setting after val => RoomNameFormat = (Time_Switch.FormatMode)val: " + Time_Switch.RoomNameFormat);
 
         menu.Add(roomNameFormatSlider);
 

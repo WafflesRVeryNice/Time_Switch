@@ -133,10 +133,7 @@ public static class Time_SwitchHooks {
         //calls Update
         orig(self);
 
-        //string formatCheck = Enum.GetName(Time_SwitchModuleSettings.RoomNameFormat);
-        Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "RoomNameFormat: " + Time_Switch.RoomNameFormat);
-
-        if (Time_Switch.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
+        if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
             Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "Teleport triggered");
 

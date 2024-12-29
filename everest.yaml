@@ -1,5 +1,5 @@
 - Name: Time_Switch
-  Version: 1.0.2
+  Version: 1.0.4
   DLL: bin/Time_Switch.dll
   Dependencies:
     - Name: EverestCore
