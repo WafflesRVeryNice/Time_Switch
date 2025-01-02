@@ -27,7 +27,7 @@ public static class Time_SwitchHooks {
 
     private static string nextLevelName;
 
-    private static Vector2 nextLevelPos;
+    private static Vector2? nextLevelPos;
 
     //the position in world space the player should teleport to
     private static Vector2 nextPlayerPosAbsolute;
@@ -111,7 +111,7 @@ public static class Time_SwitchHooks {
     }
 
 
-    public static Vector2 GetPlayerPos(Vector2 orig_playerPos)
+    private static Vector2 GetPlayerPos(Vector2 orig_playerPos)
     {
         if (Time_SwitchHooks.correctionILsActive)
         {
@@ -135,7 +135,7 @@ public static class Time_SwitchHooks {
 
         if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
-            Logger.Log(LogLevel.Info, "Waffles - TimeSwitch", "Teleport triggered");
+            Logger.Log(LogLevel.Verbose, "Time Switch", "Teleport triggered");
 
             //activates ILs
             correctionILsActive = true;
@@ -152,7 +152,7 @@ public static class Time_SwitchHooks {
 
 
     //---Teleporting the player---
-    static void TeleportPlayer(Player self)
+    private static void TeleportPlayer(Player self)
     {
         //positions use pixels for units
 
@@ -178,17 +178,26 @@ public static class Time_SwitchHooks {
         //finds room on the other timeline with the same identifier
         FindNextLevel(level, nextLevelTimeline, currentLevelIdentifier);
 
-        //gets player position to teleport to in world space
-        nextPlayerPosAbsolute = new Vector2(nextLevelPos.X + playerPosRelativeToLevel.X, nextLevelPos.Y + playerPosRelativeToLevel.Y);
+        if (nextLevelName != null && nextLevelPos != null)
+        {
+            Vector2 pos = (Vector2)nextLevelPos;
+            //gets player position to teleport to in world space
+            nextPlayerPosAbsolute = new Vector2(pos.X + playerPosRelativeToLevel.X, pos.Y + playerPosRelativeToLevel.Y);
 
-        //at the end of the frame it teleports the player to the new room with the new player position
-        //note: the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
-        level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
+            //at the end of the frame it teleports the player to the new room with the new player position
+            //note: the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
+            level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
+        }
+        else
+        {
+            Logger.Log(LogLevel.Error, "Time Switch", "Time Switch failed - Did not find a room to teleport to, check that your room are named correctly and that you are using the correct format setting");
+
+            correctionILsActive = false;
+        }
     }
 
-
     //returns the character used for the other timeline
-    static string TimelinePicker(string currentLevelName)
+    private static string TimelinePicker(string currentLevelName)
     {
         Time_Switch.FormatMode format = Time_SwitchModule.Settings.RoomNameFormat;
 
@@ -224,41 +233,54 @@ public static class Time_SwitchHooks {
     }
 
 
-    static string FetchCurrentLevelIdentifier(string currentLevelName)
+    private static string FetchCurrentLevelIdentifier(string currentLevelName)
     {
-        //if the "clean" format is used it reads the first character as well
-        string currentLevelNumberDigit0 = string.Empty;
-
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
+        if (currentLevelName.Length >= 3)
         {
-            currentLevelNumberDigit0 = currentLevelName[0].ToString();
+            //if the "clean" format is used it reads the first character as well
+            string currentLevelNumberDigit0 = string.Empty;
+
+            if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && currentLevelName.Length >= 4)
+            {
+                currentLevelNumberDigit0 = currentLevelName[0].ToString();
+            }
+            else if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && !(currentLevelName.Length >= 4))
+            {
+                Logger.Log(LogLevel.Error, "Time Switch", "room name is too short for chosen format, attempting simpler format");
+            }
+
+            string currentLevelNumberDigit1 = currentLevelName[1].ToString();
+            string currentLevelNumberDigit2 = currentLevelName[2].ToString();
+
+            //adds characters to a single string
+            return currentLevelNumberDigit0 + currentLevelNumberDigit1 + currentLevelNumberDigit2;
         }
-
-        string currentLevelNumberDigit1 = currentLevelName[1].ToString();
-        string currentLevelNumberDigit2 = currentLevelName[2].ToString();
-
-        //adds characters to a single string
-        return currentLevelNumberDigit0 + currentLevelNumberDigit1 + currentLevelNumberDigit2;
+        else
+        {
+            Logger.Log(LogLevel.Error, "Time Switch", "room name is too short");
+            return null;
+        }
     }
 
 
-    static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelIdentifier)
+    private static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelIdentifier)
     {
         //MapData is a list of LevelData of all rooms in the map
         MapData currentMapData = level.Session.MapData;
 
         LevelData nextPotentialLevel = null;
 
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1)
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1 && nextLevelTimeline != null && currentLevelIdentifier != null)
         {
             //finds the LevelData for the room that has the correct first character and same identifier
             nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[0] == nextLevelTimeline[0] && item.Name[1..3] == currentLevelIdentifier);
         }
 
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && nextLevelTimeline != null && currentLevelIdentifier != null)
         {
             //finds the LevelData for the room that has the correct last character and same identifier
             nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[^1] == nextLevelTimeline[0] && item.Name[0..3] == currentLevelIdentifier);
+            
         }
 
         if (nextPotentialLevel != null)
@@ -267,6 +289,12 @@ public static class Time_SwitchHooks {
 
             //Bounds.Left is the X value of the left side of the room, Bounds.Top is the Y value of the top of the room
             nextLevelPos = new Vector2(nextPotentialLevel.Bounds.Left, nextPotentialLevel.Bounds.Top);
+        }
+        else
+        {
+            nextLevelName = null;
+
+            nextLevelPos = null;
         }
     }
 
