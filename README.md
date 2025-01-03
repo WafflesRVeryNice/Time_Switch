@@ -3,7 +3,7 @@
 
 The mod works by teleporting the player between 2 rooms based on the rooms' names  
 
-Check the wiki for information on how to use the mod
+Check the [wiki](https://github.com/WafflesRVeryNice/Time_Switch/wiki) for information on how to use the mod
 
 
 ## Trivia
