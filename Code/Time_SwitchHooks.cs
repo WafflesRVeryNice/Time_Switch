@@ -12,6 +12,7 @@ using System.Reflection;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings;
+using System.Collections.Generic;
 
 
 
@@ -63,12 +64,49 @@ public static class Time_SwitchHooks {
     }
 
 
-    //---sets room name format setting to the setting previously used by the map---
+    //---sets room name format setting to the setting previously used by the map, can also automatically apply room name format to save file based on room names in map---
     private static void LevelLoader_StartLevel(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
     {
         orig(self);
 
-        Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
+        if (Time_SwitchModule.SaveData.RoomNameFormat != Time_Switch.FormatMode.off)
+        {
+            Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
+
+            Logger.Log(LogLevel.Info, "Time Switch", "Room name format was applied from save file");
+        }
+        
+        if (Time_SwitchModule.SaveData.RoomNameFormat == Time_Switch.FormatMode.off)
+        {
+            List<char> firstChars = [];
+            List<char> lastChars = [];
+
+            foreach (LevelData level in self.session.MapData.Levels)
+            {
+                if (!firstChars.Contains(level.Name[0]) && level.Name[0] != '_' && level.Name[0] != '-')
+                {
+                    firstChars.Add(level.Name[0]);
+                }
+                if (!lastChars.Contains(level.Name[^1]) && level.Name[^1] != '_' && level.Name[^1] != '-')
+                {
+                    lastChars.Add(level.Name[^1]);
+                }
+            }
+
+            if (firstChars.Count == 2)
+            {
+                Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format1;
+
+                Logger.Log(LogLevel.Info, "Time Switch", "Room name format was automatically applied based on room names");
+            }
+            else if (lastChars.Count == 2)
+            {
+                Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format2;
+
+                Logger.Log(LogLevel.Info, "Time Switch", "Room name format was automatically applied based on room names");
+            }
+            Logger.Log(LogLevel.Info, "Time Switch", "Room name format was not automatically applied");
+        }
     }
 
     //---
@@ -318,7 +356,7 @@ public static class Time_SwitchHooks {
     //---
 
 
-    //---tunrs off mod when exiting map---
+    //---turns off mod when exiting map---
     private static void LevelExit_Begin(On.Celeste.LevelExit.orig_Begin orig, LevelExit self)
     {
         orig(self);
@@ -326,7 +364,7 @@ public static class Time_SwitchHooks {
         //save setting to SaveData
         Time_SwitchModule.SaveData.RoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
 
-        //turn off mod
+        //always turns off mod when exiting map
         Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.off;
     }
 
