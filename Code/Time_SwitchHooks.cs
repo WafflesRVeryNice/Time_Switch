@@ -44,90 +44,38 @@ public static class Time_SwitchHooks {
 
     internal static void Load() 
     {
+        On.Celeste.LevelLoader.StartLevel += LevelLoader_StartLevel;
         On.Celeste.Player.Update += Player_Update;
         IL.Celeste.Level.TeleportTo += Level_TeleportTo;
         CancelDashRefillHook = new(typeof(Player).GetMethod("orig_Added", BindingFlags.Public | BindingFlags.Instance), Time_SwitchHooks.CancelDashReset);
+        On.Celeste.LevelExit.Begin += LevelExit_Begin;
     }
 
     
 
     internal static void Unload() 
     {
+        On.Celeste.LevelLoader.StartLevel -= LevelLoader_StartLevel;
         On.Celeste.Player.Update -= Player_Update;
         IL.Celeste.Level.TeleportTo -= Level_TeleportTo;
         CancelDashRefillHook.Dispose();
+        On.Celeste.LevelExit.Begin -= LevelExit_Begin;
     }
 
 
-
-    //---Stops the player getting all their dashes back when time switching---
-    private static void CancelDashReset(ILContext il)
+    //---sets room name format setting to the setting previously used by the map---
+    private static void LevelLoader_StartLevel(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
     {
-        ILCursor cursor = new(il);
+        orig(self);
 
-        cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Player>("get_MaxDashes"));
-
-        cursor.EmitLdarg0();
-
-        cursor.EmitDelegate(GetPlayerDashes);
-
-        //sets active false so it's not true next frame
-        Time_SwitchHooks.correctionILsActive = false;
-    }
-
-
-    private static int GetPlayerDashes(int MaxDashes, Player player)
-    {
-        if (Time_SwitchHooks.correctionILsActive)
-        {
-            //doesn't change Dashes value
-            return player.Dashes;
-        }
-        else
-        {
-            //vanilla
-            return MaxDashes;
-        }
+        Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
     }
 
     //---
 
 
 
-    //---Corrects position from nearest spawn to same position in the room as the player was before teleporting---
-    private static void Level_TeleportTo(MonoMod.Cil.ILContext il)
-    {
-        ILCursor cursor = new (il);
-
-        cursor.GotoNext(MoveType.After, instr => instr.MatchLdflda<Session>("RespawnPoint"));
-
-        cursor.Index++;
-
-        cursor.EmitDelegate(GetPlayerPos);
-
-        cursor.Index++;
-
-        //doesn't set active false so it's still true for other IL hook
-    }
-
-
-    private static Vector2 GetPlayerPos(Vector2 orig_playerPos)
-    {
-        if (Time_SwitchHooks.correctionILsActive)
-        {
-            return Time_SwitchHooks.nextPlayerPosAbsolute;
-        }
-        else
-        {
-            //causes vanilla behaviour
-            return orig_playerPos;
-        }
-    }
-
-    //---
-
-
-    //hook that teleport the player, hooks Update instead of orig_Update because it's "safer"
+    //hook that teleports the player, hooks Update instead of orig_Update because it's "safer"
     private static void Player_Update(On.Celeste.Player.orig_Update orig, Player self)
     {
         //calls Update
@@ -265,7 +213,7 @@ public static class Time_SwitchHooks {
 
     private static void FindNextLevel(Level level, string nextLevelTimeline, string currentLevelIdentifier)
     {
-        //MapData is a list of LevelData of all rooms in the map
+        //MapData.levels is a list of LevelData of all rooms in the map
         MapData currentMapData = level.Session.MapData;
 
         LevelData nextPotentialLevel = null;
@@ -296,6 +244,90 @@ public static class Time_SwitchHooks {
 
             nextLevelPos = null;
         }
+    }
+
+    //---
+
+    
+
+
+    //---Corrects position from nearest spawn to same position in the room as the player was before teleporting---
+    private static void Level_TeleportTo(MonoMod.Cil.ILContext il)
+    {
+        ILCursor cursor = new(il);
+
+        cursor.GotoNext(MoveType.After, instr => instr.MatchLdflda<Session>("RespawnPoint"));
+
+        cursor.Index++;
+
+        cursor.EmitDelegate(GetPlayerPos);
+
+        cursor.Index++;
+
+        //doesn't set active false so it's still true for other IL hook
+    }
+
+
+    private static Vector2 GetPlayerPos(Vector2 orig_playerPos)
+    {
+        if (Time_SwitchHooks.correctionILsActive)
+        {
+            return Time_SwitchHooks.nextPlayerPosAbsolute;
+        }
+        else
+        {
+            //causes vanilla behaviour
+            return orig_playerPos;
+        }
+    }
+
+    //---
+
+
+
+    //---Stops the player getting all their dashes back when time switching---
+    private static void CancelDashReset(ILContext il)
+    {
+        ILCursor cursor = new(il);
+
+        cursor.GotoNext(MoveType.After, instr => instr.MatchCallvirt<Player>("get_MaxDashes"));
+
+        cursor.EmitLdarg0();
+
+        cursor.EmitDelegate(GetPlayerDashes);
+
+        //sets active false so it's not true next frame
+        Time_SwitchHooks.correctionILsActive = false;
+    }
+
+
+    private static int GetPlayerDashes(int MaxDashes, Player player)
+    {
+        if (Time_SwitchHooks.correctionILsActive)
+        {
+            //doesn't change Dashes value
+            return player.Dashes;
+        }
+        else
+        {
+            //vanilla
+            return MaxDashes;
+        }
+    }
+
+    //---
+
+
+    //---tunrs off mod when exiting map---
+    private static void LevelExit_Begin(On.Celeste.LevelExit.orig_Begin orig, LevelExit self)
+    {
+        orig(self);
+
+        //save setting to SaveData
+        Time_SwitchModule.SaveData.RoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
+
+        //turn off mod
+        Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.off;
     }
 
     //---
