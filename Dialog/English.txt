@@ -1,12 +1,20 @@
 Time_Switch= Time Switch mod
 bin_Time_Switch= Time Switch
 
-Setting_RoomNameFormat_Name= Enabled
+Setting_RoomNameFormat_Name= Enabled Room Name Format
 
 Setting_RoomNameFormat_Option_off= off
 Setting_RoomNameFormat_Option_Format1= simple
 Setting_RoomNameFormat_Option_Format2= clean
 
-Setting_RoomNameFormat_Description_off= not active - check gamebanana or github page for detailed info on room name formats
+Setting_RoomNameFormat_Description_off= check time switch wiki for detailed info on room name formats
 Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)
 Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timeline)
+
+
+Setting_AutomaticFormatDetection_Description= 
+When enabled the room name format setting is applied based on the room names in the map
+Doesn't work for campaigns or maps that use multiple formats
+Turn this off if it's causing issues
+
+Setting_LegacyTimelines_Description= When enabled timelines use "a" and "b" - keep off if not required

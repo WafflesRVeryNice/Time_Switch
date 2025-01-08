@@ -52,9 +52,15 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
         //+++
     }
 
+    [SettingInGame(false)]
+    [SettingSubText("Setting_AutomaticFormatDetection_Description")]
     public bool AutomaticFormatDetection { get; set; } = true;
 
+    
+    [SettingInGame(false)]
+    [SettingSubText("Setting_LegacyTimelines_Description")]
     public bool LegacyTimelines { get; set; } = false;
 
+    [SettingIgnore]
     public bool DisableKeyBind { get; set; } = false;
 }

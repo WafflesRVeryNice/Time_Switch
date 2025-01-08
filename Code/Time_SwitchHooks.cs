@@ -117,9 +117,6 @@ public static class Time_SwitchHooks {
         List<char> mostCommonFirstChars = firstCharList.FindModes().ToList();
         List<char> mostCommonLastChars = lastCharList.FindModes().ToList();
 
-        foreach (var item in mostCommonFirstChars) { Logger.Log(LogLevel.Info, "Time Switch", "most common first chars " + item); }
-        foreach (var item in mostCommonLastChars) { Logger.Log(LogLevel.Info, "Time Switch", "most common last chars " + item); }
-
         if (mostCommonFirstChars.Count == 2)
         {
             timelineStartA = mostCommonFirstChars[0].ToString();
@@ -152,8 +149,6 @@ public static class Time_SwitchHooks {
         return list.Where(x => x.Count() == maxCount).Select(x => x.Key);
     }
     //+++
-
-    //---
 
 
 
@@ -268,32 +263,37 @@ public static class Time_SwitchHooks {
     //returns the character used for the other timeline
     private static string TimelinePicker(string currentLevelName)
     {
-        Time_Switch.FormatMode format = Time_SwitchModule.Settings.RoomNameFormat;
+        //this is here instead of being in LevelLoader incase it is changed mid-map
+        bool legacy = Time_SwitchModule.Settings.LegacyTimelines;
 
-        //TODO add support for any unicode characters
-
-        if (format == Time_Switch.FormatMode.Format1)
+        if (legacy && timelineStartA != "a" || legacy && timelineEndA != "a" || legacy && timelineStartB != "b" || legacy && timelineEndB != "b")
         {
-            if (currentLevelName.StartsWith("a"))
+            timelineStartA = timelineEndA = "a";
+            timelineStartB = timelineEndB = "b";
+        }
+
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1)
+        {
+            if (currentLevelName.StartsWith(timelineStartA))
             {
-                return "b";
+                return timelineStartB;
             }
-            else if (currentLevelName.StartsWith("b"))
+            else if (currentLevelName.StartsWith(timelineStartB))
             {
-                return "a";
+                return timelineStartA;
             }
             return null;
         }
 
-        if (format == Time_Switch.FormatMode.Format2)
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
         {
-            if (currentLevelName.EndsWith("a"))
+            if (currentLevelName.EndsWith(timelineEndA))
             {
-                return "b";
+                return timelineEndB;
             }
-            else if (currentLevelName.EndsWith("b"))
+            else if (currentLevelName.EndsWith(timelineEndB))
             {
-                return "a";
+                return timelineEndA;
             }
             return null;
         }
