@@ -13,6 +13,8 @@ using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings;
 using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 
 
 
@@ -25,6 +27,12 @@ public static class Time_SwitchHooks {
 
     //scene is what is currently being displayed (menu, level, etc)
     public static Scene Scene { get; private set; }
+
+    //vars for using any 2 characters for timeline
+    private static string timelineStartA;
+    private static string timelineStartB;
+    private static string timelineEndA;
+    private static string timelineEndB;
 
     private static string nextLevelName;
 
@@ -69,42 +77,117 @@ public static class Time_SwitchHooks {
     {
         orig(self);
 
-        if (Time_SwitchModule.SaveData.RoomNameFormat != Time_Switch.FormatMode.off)
+        //using firstLoad from SaveData means this doesn't work in campaigns and doesn't update on map reloads
+        if (Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection)
+        {
+            AutoApplyFormatSetting(self); //TODO allow reloading map to trigger this or add a setting to enable this everything a map loads
+        }
+        if (!Time_SwitchModule.SaveData.firstLoad)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
 
             Logger.Log(LogLevel.Info, "Time Switch", "Room name format was applied from save file");
         }
-        
-        if (Time_SwitchModule.SaveData.RoomNameFormat == Time_Switch.FormatMode.off)
+
+        if (!Time_SwitchModule.Settings.LegacyTimelines)
         {
-            List<char> firstChars = [];
-            List<char> lastChars = [];
+            DetectTimelines(self);
+        }
+    }
 
-            foreach (LevelData level in self.session.MapData.Levels)
+
+
+    private static void DetectTimelines(LevelLoader self)
+    {
+        List<char> firstCharList = [];
+        List<char> lastCharList = [];
+
+        foreach (LevelData level in self.session.MapData.Levels)
+        {
+            if (level.Name[0] != '_' && level.Name[0] != '-')
             {
-                if (!firstChars.Contains(level.Name[0]) && level.Name[0] != '_' && level.Name[0] != '-')
-                {
-                    firstChars.Add(level.Name[0]);
-                }
-                if (!lastChars.Contains(level.Name[^1]) && level.Name[^1] != '_' && level.Name[^1] != '-')
-                {
-                    lastChars.Add(level.Name[^1]);
-                }
+                firstCharList.Add(level.Name[0]);
             }
-
-            if (firstChars.Count == 2)
+            if (level.Name[^1] != '_' && level.Name[^1] != '-')
             {
-                Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format1;
-
-                Logger.Log(LogLevel.Info, "Time Switch", "Room name format was automatically applied based on room names");
+                lastCharList.Add(level.Name[^1]);
             }
-            else if (lastChars.Count == 2)
+        }
+
+        List<char> mostCommonFirstChars = firstCharList.FindModes().ToList();
+        List<char> mostCommonLastChars = lastCharList.FindModes().ToList();
+
+        foreach (var item in mostCommonFirstChars) { Logger.Log(LogLevel.Info, "Time Switch", "most common first chars " + item); }
+        foreach (var item in mostCommonLastChars) { Logger.Log(LogLevel.Info, "Time Switch", "most common last chars " + item); }
+
+        if (mostCommonFirstChars.Count == 2)
+        {
+            timelineStartA = mostCommonFirstChars[0].ToString();
+            timelineStartB = mostCommonFirstChars[1].ToString();
+        }
+        if (mostCommonLastChars.Count == 2)
+        {
+            timelineEndA = mostCommonLastChars[0].ToString();
+            timelineEndB = mostCommonLastChars[1].ToString();
+        }
+
+        if (mostCommonFirstChars.Count != 2 && Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1
+            || mostCommonLastChars.Count != 2 && Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
+        {
+            Logger.Log(LogLevel.Error, "Time Switch", $"The room name format setting is set to {Time_SwitchModule.Settings.RoomNameFormat} - "
+                + Dialog.Clean($"Setting_RoomNameFormat_Option_{Enum.GetName(Time_SwitchModule.Settings.RoomNameFormat)}")
+                + " which doesn't match the timeline position in the map's room names or number of timelines");
+        }
+    }
+
+
+
+    //+++returns most common characters+++ stollen from https://stackoverflow.com/a/16850071
+    public static IEnumerable<T> FindModes<T>(this IEnumerable<T> input)
+    {
+        var list = input.ToLookup(x => x);
+        if (list.Count == 0)
+            return Enumerable.Empty<T>();
+        var maxCount = list.Max(x => x.Count());
+        return list.Where(x => x.Count() == maxCount).Select(x => x.Key);
+    }
+    //+++
+
+    //---
+
+
+
+    private static void AutoApplyFormatSetting(LevelLoader self)
+    {
+        List<char> firstChars = [];
+        List<char> lastChars = [];
+
+        foreach (LevelData level in self.session.MapData.Levels)
+        {
+            if (!firstChars.Contains(level.Name[0]) && level.Name[0] != '_' && level.Name[0] != '-')
             {
-                Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format2;
-
-                Logger.Log(LogLevel.Info, "Time Switch", "Room name format was automatically applied based on room names");
+                firstChars.Add(level.Name[0]);
             }
+            if (!lastChars.Contains(level.Name[^1]) && level.Name[^1] != '_' && level.Name[^1] != '-')
+            {
+                lastChars.Add(level.Name[^1]);
+            }
+        }
+
+        if (lastChars.Count == 2 && firstChars.Count != 2)
+        {
+            Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format2;
+
+            Logger.Log(LogLevel.Info, "Time Switch", "Room name format 2 - clean was automatically applied based on room names");
+        }
+        else if (firstChars.Count == 2 && lastChars.Count != 2)
+        {
+            Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format1;
+
+            Logger.Log(LogLevel.Info, "Time Switch", "Room name format 1 - simple was automatically applied based on room names");
+        }
+        else
+        {
             Logger.Log(LogLevel.Info, "Time Switch", "Room name format was not automatically applied");
         }
     }
@@ -162,7 +245,7 @@ public static class Time_SwitchHooks {
         string currentLevelIdentifier = FetchCurrentLevelIdentifier(currentLevelName);
 
         //finds room on the other timeline with the same identifier
-        FindNextLevel(level, nextLevelTimeline, currentLevelIdentifier);
+        FindNextLevel(level, nextLevelTimeline, currentLevelIdentifier); //TODO add if to check for nulls + error message
 
         if (nextLevelName != null && nextLevelPos != null)
         {
@@ -176,7 +259,7 @@ public static class Time_SwitchHooks {
         }
         else
         {
-            Logger.Log(LogLevel.Error, "Time Switch", "Time Switch failed - Did not find a room to teleport to, check that your room are named correctly and that you are using the correct format setting");
+            Logger.Log(LogLevel.Error, "Time Switch", "Time Switch failed - Did not find a room to teleport to, check that your rooms are named correctly and that you are using the correct format setting");
 
             correctionILsActive = false;
         }
@@ -232,7 +315,7 @@ public static class Time_SwitchHooks {
             }
             else if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && !(currentLevelName.Length >= 4))
             {
-                Logger.Log(LogLevel.Error, "Time Switch", "room name is too short for chosen format, attempting simpler format");
+                Logger.Log(LogLevel.Error, "Time Switch", "room name is too short for format 2 - clean, attempting to use format 1 - simple");
             }
 
             string currentLevelNumberDigit1 = currentLevelName[1].ToString();
@@ -243,7 +326,8 @@ public static class Time_SwitchHooks {
         }
         else
         {
-            Logger.Log(LogLevel.Error, "Time Switch", "room name is too short");
+            Logger.Log(LogLevel.Error, "Time Switch", "Room name is too short");
+
             return null;
         }
     }
@@ -266,7 +350,6 @@ public static class Time_SwitchHooks {
         {
             //finds the LevelData for the room that has the correct last character and same identifier
             nextPotentialLevel = currentMapData.Levels.Find(item => item.Name[^1] == nextLevelTimeline[0] && item.Name[0..3] == currentLevelIdentifier);
-            
         }
 
         if (nextPotentialLevel != null)
@@ -363,6 +446,8 @@ public static class Time_SwitchHooks {
 
         //save setting to SaveData
         Time_SwitchModule.SaveData.RoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
+
+        Time_SwitchModule.SaveData.firstLoad = false;
 
         //always turns off mod when exiting map
         Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.off;

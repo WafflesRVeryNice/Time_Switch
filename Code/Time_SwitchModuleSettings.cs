@@ -51,4 +51,10 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
         };
         //+++
     }
+
+    public bool AutomaticFormatDetection { get; set; } = true;
+
+    public bool LegacyTimelines { get; set; } = false;
+
+    public bool DisableKeyBind { get; set; } = false;
 }
