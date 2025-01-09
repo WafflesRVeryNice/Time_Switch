@@ -60,7 +60,7 @@ public static class Time_SwitchHooks {
         On.Celeste.LevelExit.Begin += LevelExit_Begin;
     }
 
-    
+
 
     internal static void Unload() 
     {
@@ -78,11 +78,11 @@ public static class Time_SwitchHooks {
         orig(self);
 
         //using firstLoad from SaveData means this doesn't work in campaigns and doesn't update on map reloads
-        if (Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection)
+        if (Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection || Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime)
         {
-            AutoApplyFormatSetting(self); //TODO allow reloading map to trigger this or add a setting to enable this everything a map loads
+            AutoApplyFormatSetting(self);
         }
-        if (!Time_SwitchModule.SaveData.firstLoad)
+        if (!Time_SwitchModule.SaveData.firstLoad && !Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
 

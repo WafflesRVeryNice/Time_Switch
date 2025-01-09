@@ -13,8 +13,10 @@ Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timel
 
 
 Setting_AutomaticFormatDetection_Description= 
-When enabled the room name format setting is applied based on the room names in the map
-Doesn't work for campaigns or maps that use multiple formats
-Turn this off if it's causing issues
+Detects the room name format used in maps and changes setting
+Only turn this off if it's causing issues
+
+Setting_AutomaticFormatDetectionEverytime_Name= Automatic Format Detection Everytime Map Loads
+Setting_AutomaticFormatDetectionEverytime_Description= Turn on when developing a map that relies on automatic format detection
 
 Setting_LegacyTimelines_Description= When enabled timelines use "a" and "b" - keep off if not required

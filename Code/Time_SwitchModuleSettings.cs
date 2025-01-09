@@ -56,6 +56,10 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
     [SettingSubText("Setting_AutomaticFormatDetection_Description")]
     public bool AutomaticFormatDetection { get; set; } = true;
 
+    [SettingName("Setting_AutomaticFormatDetectionEverytime_Name")]
+    [SettingSubText("Setting_AutomaticFormatDetectionEverytime_Description")]
+    public bool AutomaticFormatDetectionEverytime { get; set; } = false;
+
     
     [SettingInGame(false)]
     [SettingSubText("Setting_LegacyTimelines_Description")]
