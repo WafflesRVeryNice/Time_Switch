@@ -1,0 +1,10 @@
+# Time Switch Control tigger (room name format + legacy timelines + automatic format detection everytime)
+triggers.Time_Switch/TimeSwitchControlTrigger.placements.name.Time_Switch_Control= Time Switch Control Trigger
+
+# descriptions
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.RoomNameFormat= No Change will do nothing. \nOff will turn off time switch. \nSimple will set the format to (timeline)(identifier)(name). \nClean will set the format to (identifier)(name)(timeline).
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.onlyOnce= Will only activate once (resets on death & reload).
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.coversScreen= Makes the trigger the size of the room.
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.legacyTimelines= Makes timelines use "a" and "b", \nturning this off again will only take effect next time the map loads, \nrequired for maps with multiple room name formats.
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.alwaysUseAutomaticFormatDetection= Will use automatic format detection every time the a map loads, \nrequired for campaigns that rely on automatic format detection.
+# add automatic format detection?

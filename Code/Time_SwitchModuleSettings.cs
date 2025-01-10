@@ -60,7 +60,6 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
     [SettingSubText("Setting_AutomaticFormatDetectionEverytime_Description")]
     public bool AutomaticFormatDetectionEverytime { get; set; } = false;
 
-    
     [SettingInGame(false)]
     [SettingSubText("Setting_LegacyTimelines_Description")]
     public bool LegacyTimelines { get; set; } = false;
