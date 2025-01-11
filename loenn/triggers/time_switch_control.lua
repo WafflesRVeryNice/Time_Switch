@@ -7,8 +7,8 @@ TimeSwitchControlTrigger.placements = {
         RoomNameFormat = 1,
 		onlyOnce = true,
 		coversScreen = false,
-		legacyTimelines = false,
-		alwaysUseAutomaticFormatDetection = false
+		AutomaticFormatDetection = 1,
+		legacyTimelines = false
     }
 }
 TimeSwitchControlTrigger.fieldOrder = {
@@ -19,8 +19,8 @@ TimeSwitchControlTrigger.fieldOrder = {
 	"RoomNameFormat",
 	"coversScreen",
 	"onlyOnce",
-	"legacyTimelines",
-	"alwaysUseAutomaticFormatDetection"
+	"AutomaticFormatDetection",
+	"legacyTimelines"
 }
 
 TimeSwitchControlTrigger.fieldInformation = { 
@@ -31,6 +31,16 @@ TimeSwitchControlTrigger.fieldInformation = {
             ["off"] = 2,
             ["simple"] = 3,
             ["clean"] = 4,
+        },
+		editable = false
+    },
+	AutomaticFormatDetection = {
+        fieldType = "integer",
+		options = {
+            ["no change"] = 1,
+            ["off"] = 2,
+            ["lightweight"] = 3,
+            ["always"] = 4,
         },
 		editable = false
     }

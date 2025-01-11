@@ -2,9 +2,8 @@
 triggers.Time_Switch/TimeSwitchControlTrigger.placements.name.Time_Switch_Control= Time Switch Control Trigger
 
 # descriptions
-triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.RoomNameFormat= No Change will do nothing. \nOff will turn off time switch. \nSimple will set the format to (timeline)(identifier)(name). \nClean will set the format to (identifier)(name)(timeline).
-triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.onlyOnce= Will only activate once (resets on death & reload).
-triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.coversScreen= Makes the trigger the size of the room.
-triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.legacyTimelines= Makes timelines use "a" and "b", \nturning this off again will only take effect next time the map loads, \nrequired for maps with multiple room name formats.
-triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.alwaysUseAutomaticFormatDetection= Will use automatic format detection every time the a map loads, \nrequired for campaigns that rely on automatic format detection.
-# add automatic format detection?
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.RoomNameFormat= No Change - do nothing \nOff - turns off time switch \nSimple - sets the format to (timeline)(identifier)(name) \nClean - sets the format to (identifier)(name)(timeline)
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again)
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.coversScreen= Makes the trigger the size of the room
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.legacyTimelines= Makes timelines use "a" and "b" \nTurning this off again will only take effect next time the map loads \nRequired for maps with multiple room name formats
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.AutomaticFormatDetection= No Change - do nothing \nOff - turns off Automatic Room Name Format Detection \nLightweight - ARNFD only triggers on first map load \nAlways - ARNFD triggers everytime map loads

@@ -1,22 +1,26 @@
-Time_Switch= Time Switch mod
-bin_Time_Switch= Time Switch
+# Time Switch Settings
 
-Setting_RoomNameFormat_Name= Enabled Room Name Format
+# Room name format
+Time_Switch_Setting_RoomNameFormat_Name= Enabled Room Name Format
 
-Setting_RoomNameFormat_Option_off= off
-Setting_RoomNameFormat_Option_Format1= simple
-Setting_RoomNameFormat_Option_Format2= clean
+Time_Switch_Setting_RoomNameFormat_Option_off= off
+Time_Switch_Setting_RoomNameFormat_Option_Format1= simple
+Time_Switch_Setting_RoomNameFormat_Option_Format2= clean
 
-Setting_RoomNameFormat_Description_off= check time switch wiki for detailed info on room name formats
-Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)
-Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timeline)
+Time_Switch_Setting_RoomNameFormat_Description_off= check time switch wiki for detailed info on room name formats
+Time_Switch_Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)
+Time_Switch_Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timeline)
 
+# Automatic room name format detection
+Time_Switch_Setting_AutomaticFormatDetection_Name= Automatic Format Detection
 
-Setting_AutomaticFormatDetection_Description= 
-Detects the room name format used in maps and changes setting
-Only turn this off if it's causing issues
+Time_Switch_Setting_AutomaticFormatDetection_Option_off= off
+Time_Switch_Setting_AutomaticFormatDetection_Option_light= lightweight
+Time_Switch_Setting_AutomaticFormatDetection_Option_always= always
 
-Setting_AutomaticFormatDetectionEverytime_Name= Automatic Format Detection Everytime Map Loads
-Setting_AutomaticFormatDetectionEverytime_Description= Turn on when developing a map that relies on automatic format detection
+Time_Switch_Setting_AutomaticFormatDetection_Description_off= only turn this off if it's causing issues{n}some maps may rely on this
+Time_Switch_Setting_AutomaticFormatDetection_Description_light= sets room name format based on room names in map{n}only triggers on first map load
+Time_Switch_Setting_AutomaticFormatDetection_Description_always= sets room name format based on room names in map{n}triggers everytime map loads
 
-Setting_LegacyTimelines_Description= When enabled timelines use "a" and "b" - keep off if not required
+# Legacy timeline characters
+Time_Switch_Setting_LegacyTimelines_Description= When enabled timelines use "a" and "b" - keep off if not required

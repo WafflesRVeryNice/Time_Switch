@@ -72,17 +72,25 @@ public static class Time_SwitchHooks {
     }
 
 
-    //---sets room name format setting to the setting previously used by the map, can also automatically apply room name format to save file based on room names in map---
+    //---changing settings on map load---
     private static void LevelLoader_StartLevel(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
     {
         orig(self);
 
-        //using firstLoad from SaveData means this doesn't work in campaigns and doesn't update on map reloads
-        if (Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection || Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime)
+        if (Time_SwitchModule.SaveData.AutomaticFormatDetection != Time_SwitchModule.Settings.AutomaticFormatDetection)
+        {
+            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_SwitchModule.SaveData.AutomaticFormatDetection; //TODO add save user settings to settings
+        }
+
+        //lightweight automatic room name format detection
+        if (Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection == Time_Switch.AutoFormat.light 
+            || Time_SwitchModule.Settings.AutomaticFormatDetection == Time_Switch.AutoFormat.always)
         {
             AutoApplyFormatSetting(self);
         }
-        if (!Time_SwitchModule.SaveData.firstLoad && !Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime)
+
+        //applies room name format from save file
+        if (!Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection != Time_Switch.AutoFormat.always)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
 
@@ -140,7 +148,7 @@ public static class Time_SwitchHooks {
 
 
     //+++returns most common characters+++ stollen from https://stackoverflow.com/a/16850071
-    public static IEnumerable<T> FindModes<T>(this IEnumerable<T> input)
+    internal static IEnumerable<T> FindModes<T>(this IEnumerable<T> input)
     {
         var list = input.ToLookup(x => x);
         if (list.Count == 0)
@@ -451,6 +459,8 @@ public static class Time_SwitchHooks {
 
         //always turns off mod when exiting map
         Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.off;
+
+        //TODO reapply user settings
     }
 
     //---

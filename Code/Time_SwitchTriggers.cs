@@ -21,15 +21,46 @@ namespace Celeste.Mod.Time_Switch;
 [CustomEntity("Time_Switch/TimeSwitchControlTrigger")]
 public class TimeSwitchControlTrigger : Trigger
 {
+    private EntityID ID;
+    private int RoomNameFormatOption;
     private bool coversScreen;
+    private bool onlyOnce;
+    private bool legacyTimelines;
+    private int AutomaticFormatDetection;
 
-    public TimeSwitchControlTrigger(EntityData data, Vector2 offset) : base(data, offset) 
+    public TimeSwitchControlTrigger(EntityData data, Vector2 offset, EntityID id) : base(data, offset) 
     {
-        int RoomNameFormatOption = data.Int("RoomNameFormat");
+        ID = id;
+        RoomNameFormatOption = data.Int("RoomNameFormat");
         coversScreen = data.Bool("coversScreen", false);
-        bool onlyOnce = data.Bool("onlyOnce", true);
-        bool legacyTimelines = data.Bool("legacyTimelines", false);
-        bool alwaysUseAutomaticFormatDetection = data.Bool("alwaysUseAutomaticFormatDetection", false);
+        onlyOnce = data.Bool("onlyOnce", true);
+        legacyTimelines = data.Bool("legacyTimelines", false);
+        AutomaticFormatDetection = data.Int("AutomaticFormatDetection");
+    }
+
+
+
+    //+++solution from extended variant mode+++ https://github.com/maddie480/ExtendedVariantMode/blob/07e7f2e48cec484613a414bb2dd6aa6e87775db9/Entities/ForMappers/AbstractExtendedVariantTrigger.cs#L69
+    public override void Added(Scene scene)
+    {
+        base.Added(scene);
+
+        Rectangle bounds = (scene as Level).Bounds;
+
+        if (coversScreen)
+        {
+            Position = new Vector2(bounds.X, bounds.Y - 24f);
+            Collider.Width = bounds.Width;
+            Collider.Height = bounds.Height + 32f;
+        }
+    }
+    //+++
+    
+
+
+    public override void OnEnter(Player player)
+    {
+        base.OnEnter(player);
 
         if (RoomNameFormatOption == 1)
         {
@@ -51,6 +82,7 @@ public class TimeSwitchControlTrigger : Trigger
         if (onlyOnce)
         {
             RemoveSelf();
+            SceneAs<Level>().Session.DoNotLoad.Add(ID);
         }
 
         if (legacyTimelines)
@@ -62,30 +94,25 @@ public class TimeSwitchControlTrigger : Trigger
             Time_SwitchModule.Settings.LegacyTimelines = false; //this only takes effect next time the map is loaded
         }
 
-        if (alwaysUseAutomaticFormatDetection)
+        if (AutomaticFormatDetection == 1)
         {
-            Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime = true;
+            //does nothing
         }
-        else if (!alwaysUseAutomaticFormatDetection && Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime == true)
+        else if (AutomaticFormatDetection == 2)
         {
-            Time_SwitchModule.Settings.AutomaticFormatDetectionEverytime = false;
+            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_Switch.AutoFormat.off;
+            Time_SwitchModule.SaveData.AutomaticFormatDetection = Time_Switch.AutoFormat.off;
         }
-    }
-
-    //+++solution from extended variant mode+++ https://github.com/maddie480/ExtendedVariantMode/blob/07e7f2e48cec484613a414bb2dd6aa6e87775db9/Entities/ForMappers/AbstractExtendedVariantTrigger.cs#L69
-    public override void Added(Scene scene)
-    {
-        base.Added(scene);
-
-        Rectangle bounds = (scene as Level).Bounds;
-
-        if (coversScreen)
+        else if (AutomaticFormatDetection == 3)
         {
-            Position = new Vector2(bounds.X, bounds.Y - 24f);
-            Collider.Width = bounds.Width;
-            Collider.Height = bounds.Height + 32f;
+            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_Switch.AutoFormat.light;
+            Time_SwitchModule.SaveData.AutomaticFormatDetection = Time_Switch.AutoFormat.light;
+        }
+        else if (AutomaticFormatDetection == 4)
+        {
+            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_Switch.AutoFormat.always;
+            Time_SwitchModule.SaveData.AutomaticFormatDetection = Time_Switch.AutoFormat.always;
         }
     }
-    //+++
 }
 

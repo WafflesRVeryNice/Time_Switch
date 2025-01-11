@@ -28,5 +28,15 @@ public static partial class Time_Switch
         Format1,
         Format2
     }
+
+    //+++solution also from everest (see above)+++
+    public static AutoFormat AutomaticFormatDetection { get; internal set; }
+
+    public enum AutoFormat
+    {
+        off,
+        light,
+        always
+    }
 }
 //+++
