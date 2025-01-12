@@ -77,7 +77,10 @@ public static class Time_SwitchHooks {
     {
         orig(self);
 
-        //TODO add save user settings to settings
+        //save user settings
+        Time_SwitchModule.Settings.userRoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
+        Time_SwitchModule.Settings.userLegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
+
 
         //applies room name format from save file
         if (!Time_SwitchModule.SaveData.firstLoad)
@@ -85,6 +88,30 @@ public static class Time_SwitchHooks {
             Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
 
             Logger.Log(LogLevel.Info, "Time Switch", "Room name format was applied from save file");
+        }
+        else
+        {
+            Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.Settings.userRoomNameFormat;
+
+            if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off)
+            {
+                Logger.Log(LogLevel.Info, "Time Switch", "Using user set room name format (unless changed by map)");
+            }
+        }
+
+        //applies Timeline type from save file or session
+        if (Time_SwitchModule.SaveData.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveFile)
+        {
+            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.SaveData.LegacyTimelines;
+        }
+        if (Time_SwitchModule.Session.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveSession)
+        {
+            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Session.LegacyTimelines;
+        }
+
+        if (Time_SwitchModule.SaveData.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveSession && Time_SwitchModule.Session.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveFile)
+        {
+            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
         }
 
         if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.auto)
@@ -410,15 +437,33 @@ public static class Time_SwitchHooks {
     {
         orig(self);
 
-        //save setting to SaveData
+        //save settings
         Time_SwitchModule.SaveData.RoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
+
+        //sets to opposite for check in levelLoader hook (honestly not sure if this logic is correct)
+        if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveFile)
+        {
+            Time_SwitchModule.SaveData.LegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
+        }
+        else
+        {
+            Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
+        }
+
+        if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveSession)
+        {
+            Time_SwitchModule.Session.LegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
+        }
+        else
+        {
+            Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
+        }
 
         Time_SwitchModule.SaveData.firstLoad = false;
 
-        //always turns off mod when exiting map
-        Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.off;
-
-        //TODO reapply user settings
+        //reapply user settings
+        Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.Settings.userRoomNameFormat;
+        Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
     }
 
     //---

@@ -20,38 +20,53 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
     public void CreateRoomNameFormatEntry(TextMenu menu, bool inGame)
     {
-        //TODO? make only available in-game
-        if (inGame)
+        //+++solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Core/CoreModuleSettings.cs#L559
+
+        TextMenu.Slider roomNameFormatSlider = new TextMenu.Slider(label: Dialog.Clean("Time_Switch_Setting_RoomNameFormat_Name"),
+            i => Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Option_{Enum.GetName((Time_Switch.FormatMode)i)}"),
+            0, Enum.GetValues<Time_Switch.FormatMode>().Length - 1, (int)RoomNameFormat);
+
+        roomNameFormatSlider.OnValueChange += val => RoomNameFormat = (Time_Switch.FormatMode)val;
+
+        menu.Add(roomNameFormatSlider);
+
+        TextMenuExt.EaseInSubHeaderExt descrText;
+
+        if (!inGame)
         {
-            //+++solution from everest+++ https://github.com/EverestAPI/Everest/blob/dev/Celeste.Mod.mm/Mod/Core/CoreModuleSettings.cs#L559
-
-            TextMenu.Slider roomNameFormatSlider = new TextMenu.Slider(label: Dialog.Clean("Time_Switch_Setting_RoomNameFormat_Name"),
-                i => Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Option_{Enum.GetName((Time_Switch.FormatMode)i)}"),
-                0, Enum.GetValues<Time_Switch.FormatMode>().Length - 1, (int)RoomNameFormat);
-
-            roomNameFormatSlider.OnValueChange += val => RoomNameFormat = (Time_Switch.FormatMode)val;
-
-            menu.Add(roomNameFormatSlider);
-
-
-            TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_{Enum.GetName(RoomNameFormat)}"), false, menu)
+            descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_Menu_{Enum.GetName(RoomNameFormat)}"), false, menu)
             {
                 TextColor = Color.Gray,
                 HeightExtra = 0f
             };
-
-            descrText.IncludeWidthInMeasurement = false;
-
-            menu.Insert(menu.Items.IndexOf(roomNameFormatSlider) + 1, descrText);
-
-            roomNameFormatSlider.OnEnter += () => descrText.FadeVisible = true;
-            roomNameFormatSlider.OnLeave += () => descrText.FadeVisible = false;
-            roomNameFormatSlider.OnValueChange += val => {
-                descrText.Title = Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_{Enum.GetName((Time_Switch.FormatMode)val)}");
-                menu.RecalculateSize();
-            };
-            //+++
         }
+        else
+        {
+            descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_InGame_{Enum.GetName(RoomNameFormat)}"), false, menu)
+            {
+                TextColor = Color.Gray,
+                HeightExtra = 0f
+            };
+        }
+
+        descrText.IncludeWidthInMeasurement = false;
+
+        menu.Insert(menu.Items.IndexOf(roomNameFormatSlider) + 1, descrText);
+
+        roomNameFormatSlider.OnEnter += () => descrText.FadeVisible = true;
+        roomNameFormatSlider.OnLeave += () => descrText.FadeVisible = false;
+        roomNameFormatSlider.OnValueChange += val => {
+            if (!inGame)
+            {
+                descrText.Title = Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_Menu_{Enum.GetName((Time_Switch.FormatMode)val)}");
+            }
+            else
+            {
+                descrText.Title = Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_InGame_{Enum.GetName((Time_Switch.FormatMode)val)}");
+            }
+            menu.RecalculateSize();
+        };
+        //+++
     }
 
 
@@ -99,7 +114,11 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
 
     [SettingIgnore]
-    public bool DisableKeyBind { get; set; } = false;
+    public bool DisableKeyBind { get; set; } = false; //TODO implement
 
-    //TODO add settings to dump user settings until exiting map
+    
+    //settings to save user settings incase they are overriden by map
+    public Time_Switch.FormatMode userRoomNameFormat { get; set; }
+
+    public Time_Switch.TimelineTypes userLegacyTimelines { get; set; }
 }

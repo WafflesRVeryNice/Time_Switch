@@ -121,16 +121,19 @@ public class TimeSwitchControlTrigger : Trigger
         {
             Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.auto;
             Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.auto;
+            Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.auto;
         }
         else if (TimelineType == 3)
         {
             Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
             Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
+            Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
         }
         else if (TimelineType == 4)
         {
             Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
             Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
+            Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
         }
     }
 }

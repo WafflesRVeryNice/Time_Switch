@@ -7,9 +7,30 @@ Time_Switch_Setting_RoomNameFormat_Option_off= off
 Time_Switch_Setting_RoomNameFormat_Option_Format1= simple
 Time_Switch_Setting_RoomNameFormat_Option_Format2= clean
 
-Time_Switch_Setting_RoomNameFormat_Description_off= check time switch wiki for detailed info on room name formats
-Time_Switch_Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)
-Time_Switch_Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timeline)
+Time_Switch_Setting_RoomNameFormat_Description_Menu_off= 
+user setting - will be overridden by maps
+check time switch wiki for detailed info on room name formats
+
+Time_Switch_Setting_RoomNameFormat_Description_Menu_Format1= 
+user setting - will be overridden by maps
+uses format (timeline)(identifier)(name)
+
+Time_Switch_Setting_RoomNameFormat_Description_Menu_Format2= 
+user setting - will be overridden by maps
+uses format (identifier)(name)(timeline)
+
+Time_Switch_Setting_RoomNameFormat_Description_InGame_off= 
+map setting - may break map
+check time switch wiki for detailed info on room name formats
+
+Time_Switch_Setting_RoomNameFormat_Description_InGame_Format1= 
+map setting - may break map
+uses format (timeline)(identifier)(name)
+
+Time_Switch_Setting_RoomNameFormat_Description_InGame_Format2= 
+map setting - may break map
+uses format (identifier)(name)(timeline)
+
 
 # Timeline Type selection (legacy timelines)
 Time_Switch_Setting_LegacyTimelines_Name= Timelines
@@ -18,9 +39,13 @@ Time_Switch_Setting_LegacyTimelines_Option_auto= Auto Detection
 Time_Switch_Setting_LegacyTimelines_Option_legacySaveFile= Save to File
 Time_Switch_Setting_LegacyTimelines_Option_legacySaveSession= Save to Session
 
-Time_Switch_Setting_LegacyTimelines_Description_auto= coming soon
-Time_Switch_Setting_LegacyTimelines_Description_legacySaveFile= also coming soon
-Time_Switch_Setting_LegacyTimelines_Description_legacySaveSession= really soon I promise
+Time_Switch_Setting_LegacyTimelines_Description_auto= 
+user setting - will be overridden by maps
+coming soon
+Time_Switch_Setting_LegacyTimelines_Description_legacySaveFile= 
+user setting - will be overridden by maps
+also coming soon
+Time_Switch_Setting_LegacyTimelines_Description_legacySaveSession= 
+user setting - will be overridden by maps
+really soon I promise
 
-# Legacy timeline characters
-Time_Switch_Setting_LegacyTimelines_Description= When enabled timelines use "a" and "b" - keep off if not required
