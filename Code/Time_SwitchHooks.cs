@@ -77,27 +77,17 @@ public static class Time_SwitchHooks {
     {
         orig(self);
 
-        if (Time_SwitchModule.SaveData.AutomaticFormatDetection != Time_SwitchModule.Settings.AutomaticFormatDetection)
-        {
-            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_SwitchModule.SaveData.AutomaticFormatDetection; //TODO add save user settings to settings
-        }
-
-        //lightweight automatic room name format detection
-        if (Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection == Time_Switch.AutoFormat.light 
-            || Time_SwitchModule.Settings.AutomaticFormatDetection == Time_Switch.AutoFormat.always)
-        {
-            AutoApplyFormatSetting(self);
-        }
+        //TODO add save user settings to settings
 
         //applies room name format from save file
-        if (!Time_SwitchModule.SaveData.firstLoad && Time_SwitchModule.Settings.AutomaticFormatDetection != Time_Switch.AutoFormat.always)
+        if (!Time_SwitchModule.SaveData.firstLoad)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.SaveData.RoomNameFormat;
 
             Logger.Log(LogLevel.Info, "Time Switch", "Room name format was applied from save file");
         }
 
-        if (!Time_SwitchModule.Settings.LegacyTimelines)
+        if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.auto)
         {
             DetectTimelines(self);
         }
@@ -157,43 +147,6 @@ public static class Time_SwitchHooks {
         return list.Where(x => x.Count() == maxCount).Select(x => x.Key);
     }
     //+++
-
-
-
-    private static void AutoApplyFormatSetting(LevelLoader self)
-    {
-        List<char> firstChars = [];
-        List<char> lastChars = [];
-
-        foreach (LevelData level in self.session.MapData.Levels)
-        {
-            if (!firstChars.Contains(level.Name[0]) && level.Name[0] != '_' && level.Name[0] != '-')
-            {
-                firstChars.Add(level.Name[0]);
-            }
-            if (!lastChars.Contains(level.Name[^1]) && level.Name[^1] != '_' && level.Name[^1] != '-')
-            {
-                lastChars.Add(level.Name[^1]);
-            }
-        }
-
-        if (lastChars.Count == 2 && firstChars.Count != 2)
-        {
-            Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format2;
-
-            Logger.Log(LogLevel.Info, "Time Switch", "Room name format 2 - clean was automatically applied based on room names");
-        }
-        else if (firstChars.Count == 2 && lastChars.Count != 2)
-        {
-            Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format1;
-
-            Logger.Log(LogLevel.Info, "Time Switch", "Room name format 1 - simple was automatically applied based on room names");
-        }
-        else
-        {
-            Logger.Log(LogLevel.Info, "Time Switch", "Room name format was not automatically applied");
-        }
-    }
 
     //---
 
@@ -271,8 +224,13 @@ public static class Time_SwitchHooks {
     //returns the character used for the other timeline
     private static string TimelinePicker(string currentLevelName)
     {
-        //this is here instead of being in LevelLoader incase it is changed mid-map
-        bool legacy = Time_SwitchModule.Settings.LegacyTimelines;
+        bool legacy = false;
+
+        //this is here instead of being in LevelLoader so it can be set in the trigger
+        if (Time_SwitchModule.Settings.LegacyTimelines != Time_Switch.TimelineTypes.auto)
+        {
+            legacy = true;
+        }
 
         if (legacy && timelineStartA != "a" || legacy && timelineEndA != "a" || legacy && timelineStartB != "b" || legacy && timelineEndB != "b")
         {

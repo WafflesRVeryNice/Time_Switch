@@ -61,43 +61,41 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
     //---setting for automatic room name format detection---
     //+++solution also from everest (see above)+++
-    public Time_Switch.AutoFormat AutomaticFormatDetection { get; set; } = Time_Switch.AutoFormat.light;
+    public Time_Switch.TimelineTypes LegacyTimelines { get; set; } = Time_Switch.TimelineTypes.auto;
 
-    public void CreateAutomaticFormatDetectionEntry(TextMenu menu, bool inGame)
+    public void CreateLegacyTimelinesEntry(TextMenu menu, bool inGame)
     {
-        TextMenu.Slider autoFormatDetectSlider = new TextMenu.Slider(label: Dialog.Clean("Time_Switch_Setting_AutomaticFormatDetection_Name"),
-            i => Dialog.Clean($"Time_Switch_Setting_AutomaticFormatDetection_Option_{Enum.GetName((Time_Switch.AutoFormat)i)}"),
-            0, Enum.GetValues<Time_Switch.AutoFormat>().Length - 1, (int)AutomaticFormatDetection);
-
-        autoFormatDetectSlider.OnValueChange += val => AutomaticFormatDetection = (Time_Switch.AutoFormat)val;
-
-        menu.Add(autoFormatDetectSlider);
-
-
-        TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_AutomaticFormatDetection_Description_{Enum.GetName(AutomaticFormatDetection)}"), false, menu)
+        if (!inGame)
         {
-            TextColor = Color.Gray,
-            HeightExtra = 0f
-        };
+            TextMenu.Slider TimelineTypeSlider = new TextMenu.Slider(label: Dialog.Clean("Time_Switch_Setting_LegacyTimelines_Name"),
+            i => Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Option_{Enum.GetName((Time_Switch.TimelineTypes)i)}"),
+            0, Enum.GetValues<Time_Switch.TimelineTypes>().Length - 1, (int)LegacyTimelines);
 
-        descrText.IncludeWidthInMeasurement = false;
+            TimelineTypeSlider.OnValueChange += val => LegacyTimelines = (Time_Switch.TimelineTypes)val;
 
-        menu.Insert(menu.Items.IndexOf(autoFormatDetectSlider) + 1, descrText);
+            menu.Add(TimelineTypeSlider);
 
-        autoFormatDetectSlider.OnEnter += () => descrText.FadeVisible = true;
-        autoFormatDetectSlider.OnLeave += () => descrText.FadeVisible = false;
-        autoFormatDetectSlider.OnValueChange += val => {
-            descrText.Title = Dialog.Clean($"Time_Switch_Setting_AutomaticFormatDetection_Description_{Enum.GetName((Time_Switch.AutoFormat)val)}");
-            menu.RecalculateSize();
-        };
+
+            TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Description_{Enum.GetName(LegacyTimelines)}"), false, menu)
+            {
+                TextColor = Color.Gray,
+                HeightExtra = 0f
+            };
+
+            descrText.IncludeWidthInMeasurement = false;
+
+            menu.Insert(menu.Items.IndexOf(TimelineTypeSlider) + 1, descrText);
+
+            TimelineTypeSlider.OnEnter += () => descrText.FadeVisible = true;
+            TimelineTypeSlider.OnLeave += () => descrText.FadeVisible = false;
+            TimelineTypeSlider.OnValueChange += val => {
+                descrText.Title = Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Description_{Enum.GetName((Time_Switch.TimelineTypes)val)}");
+                menu.RecalculateSize();
+            };
+        }
     }
 
     //---
-
-
-    [SettingInGame(false)]
-    [SettingSubText("Time_Switch_Setting_LegacyTimelines_Description")]
-    public bool LegacyTimelines { get; set; } = false;
 
 
     [SettingIgnore]

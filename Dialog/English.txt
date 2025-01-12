@@ -11,16 +11,16 @@ Time_Switch_Setting_RoomNameFormat_Description_off= check time switch wiki for d
 Time_Switch_Setting_RoomNameFormat_Description_Format1= uses format (timeline)(identifier)(name)
 Time_Switch_Setting_RoomNameFormat_Description_Format2= uses format (identifier)(name)(timeline)
 
-# Automatic room name format detection
-Time_Switch_Setting_AutomaticFormatDetection_Name= Automatic Format Detection
+# Timeline Type selection (legacy timelines)
+Time_Switch_Setting_LegacyTimelines_Name= Timelines
 
-Time_Switch_Setting_AutomaticFormatDetection_Option_off= off
-Time_Switch_Setting_AutomaticFormatDetection_Option_light= lightweight
-Time_Switch_Setting_AutomaticFormatDetection_Option_always= always
+Time_Switch_Setting_LegacyTimelines_Option_auto= Auto Detection
+Time_Switch_Setting_LegacyTimelines_Option_legacySaveFile= Save to File
+Time_Switch_Setting_LegacyTimelines_Option_legacySaveSession= Save to Session
 
-Time_Switch_Setting_AutomaticFormatDetection_Description_off= only turn this off if it's causing issues{n}some maps may rely on this
-Time_Switch_Setting_AutomaticFormatDetection_Description_light= sets room name format based on room names in map{n}only triggers on first map load
-Time_Switch_Setting_AutomaticFormatDetection_Description_always= sets room name format based on room names in map{n}triggers everytime map loads
+Time_Switch_Setting_LegacyTimelines_Description_auto= coming soon
+Time_Switch_Setting_LegacyTimelines_Description_legacySaveFile= also coming soon
+Time_Switch_Setting_LegacyTimelines_Description_legacySaveSession= really soon I promise
 
 # Legacy timeline characters
 Time_Switch_Setting_LegacyTimelines_Description= When enabled timelines use "a" and "b" - keep off if not required

@@ -23,19 +23,19 @@ public class TimeSwitchControlTrigger : Trigger
 {
     private EntityID ID;
     private int RoomNameFormatOption;
+    private int mode;
+    private int TimelineType;
     private bool coversScreen;
     private bool onlyOnce;
-    private bool legacyTimelines;
-    private int AutomaticFormatDetection;
 
     public TimeSwitchControlTrigger(EntityData data, Vector2 offset, EntityID id) : base(data, offset) 
     {
         ID = id;
         RoomNameFormatOption = data.Int("RoomNameFormat");
+        mode = data.Int("Activate");
+        TimelineType = data.Int("Timelines");
         coversScreen = data.Bool("coversScreen", false);
         onlyOnce = data.Bool("onlyOnce", true);
-        legacyTimelines = data.Bool("legacyTimelines", false);
-        AutomaticFormatDetection = data.Int("AutomaticFormatDetection");
     }
 
 
@@ -62,6 +62,34 @@ public class TimeSwitchControlTrigger : Trigger
     {
         base.OnEnter(player);
 
+        if (mode == 1)
+        {
+            Trigger();
+        }
+    }
+
+    public override void OnLeave(Player player)
+    {
+        base.OnLeave(player);
+
+        if (mode == 2)
+        {
+            Trigger();
+        }
+    }
+
+    public override void Awake(Scene scene)
+    {
+        base.Awake(scene);
+
+        if (mode == 3)
+        {
+            Trigger();
+        }
+    }
+
+    private void Trigger()
+    {
         if (RoomNameFormatOption == 1)
         {
             //does nothing
@@ -85,33 +113,24 @@ public class TimeSwitchControlTrigger : Trigger
             SceneAs<Level>().Session.DoNotLoad.Add(ID);
         }
 
-        if (legacyTimelines)
-        {
-            Time_SwitchModule.Settings.LegacyTimelines = true;
-        }
-        else if (!legacyTimelines && Time_SwitchModule.Settings.LegacyTimelines == true)
-        {
-            Time_SwitchModule.Settings.LegacyTimelines = false; //this only takes effect next time the map is loaded
-        }
-
-        if (AutomaticFormatDetection == 1)
+        if (TimelineType == 1)
         {
             //does nothing
         }
-        else if (AutomaticFormatDetection == 2)
+        else if (TimelineType == 2)
         {
-            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_Switch.AutoFormat.off;
-            Time_SwitchModule.SaveData.AutomaticFormatDetection = Time_Switch.AutoFormat.off;
+            Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.auto;
+            Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.auto;
         }
-        else if (AutomaticFormatDetection == 3)
+        else if (TimelineType == 3)
         {
-            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_Switch.AutoFormat.light;
-            Time_SwitchModule.SaveData.AutomaticFormatDetection = Time_Switch.AutoFormat.light;
+            Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
+            Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
         }
-        else if (AutomaticFormatDetection == 4)
+        else if (TimelineType == 4)
         {
-            Time_SwitchModule.Settings.AutomaticFormatDetection = Time_Switch.AutoFormat.always;
-            Time_SwitchModule.SaveData.AutomaticFormatDetection = Time_Switch.AutoFormat.always;
+            Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
+            Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
         }
     }
 }

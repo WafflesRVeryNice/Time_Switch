@@ -1,26 +1,31 @@
+local enums = require("consts.celeste_enums")
+
 local TimeSwitchControlTrigger = {}
 
+
 TimeSwitchControlTrigger.name = "Time_Switch/TimeSwitchControlTrigger"
+
 TimeSwitchControlTrigger.placements = {
     name = "Time_Switch_Control",
     data = {
         RoomNameFormat = 1,
+		Activate = 1,
+		Timelines = 1,
 		onlyOnce = true,
-		coversScreen = false,
-		AutomaticFormatDetection = 1,
-		legacyTimelines = false
+		coversScreen = false
     }
 }
+
 TimeSwitchControlTrigger.fieldOrder = {
 	"x",
 	"y",
 	"width",
 	"height",
 	"RoomNameFormat",
-	"coversScreen",
+	"Activate",
+	"Timelines",
 	"onlyOnce",
-	"AutomaticFormatDetection",
-	"legacyTimelines"
+	"coversScreen"
 }
 
 TimeSwitchControlTrigger.fieldInformation = { 
@@ -34,16 +39,26 @@ TimeSwitchControlTrigger.fieldInformation = {
         },
 		editable = false
     },
-	AutomaticFormatDetection = {
+	Timelines = {
         fieldType = "integer",
 		options = {
             ["no change"] = 1,
-            ["off"] = 2,
-            ["lightweight"] = 3,
-            ["always"] = 4,
+            ["automatic detection"] = 2,
+            ["legacy / save to savefile"] = 3,
+            ["legacy / save to session"] = 4,
         },
 		editable = false
+    },
+	Activate = {
+		fieldType = "integer",
+        options = {
+			["OnPlayerEnter"] = 1,
+            ["OnPlayerLeave"] = 2,
+            ["OnLevelStart"] = 3,
+		},
+        editable = false
     }
 }
+
 
 return TimeSwitchControlTrigger

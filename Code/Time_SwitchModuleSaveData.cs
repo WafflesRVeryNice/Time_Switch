@@ -6,5 +6,5 @@ public class Time_SwitchModuleSaveData : EverestModuleSaveData
 
     public Time_Switch.FormatMode RoomNameFormat { get; set; }
 
-    public Time_Switch.AutoFormat AutomaticFormatDetection { get; set; }
+    public Time_Switch.TimelineTypes LegacyTimelines { get; set; }
 }

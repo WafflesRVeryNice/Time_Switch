@@ -30,13 +30,13 @@ public static partial class Time_Switch
     }
 
     //+++solution also from everest (see above)+++
-    public static AutoFormat AutomaticFormatDetection { get; internal set; }
+    public static TimelineTypes LegacyTimelines { get; internal set; }
 
-    public enum AutoFormat
+    public enum TimelineTypes
     {
-        off,
-        light,
-        always
+        auto,
+        legacySaveFile,
+        legacySaveSession
     }
 }
 //+++
