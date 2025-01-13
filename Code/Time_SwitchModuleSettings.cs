@@ -116,9 +116,11 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
     [SettingIgnore]
     public bool DisableKeyBind { get; set; } = false; //TODO implement
 
-    
+
     //settings to save user settings incase they are overriden by map
+    [SettingIgnore]
     public Time_Switch.FormatMode userRoomNameFormat { get; set; }
 
+    [SettingIgnore]
     public Time_Switch.TimelineTypes userLegacyTimelines { get; set; }
 }

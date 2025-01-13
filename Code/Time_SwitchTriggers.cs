@@ -97,14 +97,20 @@ public class TimeSwitchControlTrigger : Trigger
         else if (RoomNameFormatOption == 2)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.off;
+            Time_SwitchModule.SaveData.RoomNameFormat = Time_Switch.FormatMode.off;
+            Time_SwitchModule.SaveData.defaultRoomNameFormat = false;
         }
         else if (RoomNameFormatOption == 3)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format1;
+            Time_SwitchModule.SaveData.RoomNameFormat = Time_Switch.FormatMode.Format1;
+            Time_SwitchModule.SaveData.defaultRoomNameFormat = false;
         }
         else if (RoomNameFormatOption == 4)
         {
             Time_SwitchModule.Settings.RoomNameFormat = Time_Switch.FormatMode.Format2;
+            Time_SwitchModule.SaveData.RoomNameFormat = Time_Switch.FormatMode.Format2;
+            Time_SwitchModule.SaveData.defaultRoomNameFormat = false;
         }
 
         if (onlyOnce)
@@ -122,18 +128,24 @@ public class TimeSwitchControlTrigger : Trigger
             Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.auto;
             Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.auto;
             Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.auto;
+            Time_SwitchModule.SaveData.defaultLegacyTimelines = false;
+            Time_SwitchModule.Session.defaultLegacyTimelines = false;
         }
         else if (TimelineType == 3)
         {
             Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
             Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
             Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
+            Time_SwitchModule.SaveData.defaultLegacyTimelines = false;
+            Time_SwitchModule.Session.defaultLegacyTimelines = false;
         }
         else if (TimelineType == 4)
         {
             Time_SwitchModule.Settings.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
             Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
             Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
+            Time_SwitchModule.SaveData.defaultLegacyTimelines = false;
+            Time_SwitchModule.Session.defaultLegacyTimelines = false;
         }
     }
 }

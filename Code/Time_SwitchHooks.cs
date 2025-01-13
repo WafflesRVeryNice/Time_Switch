@@ -72,6 +72,7 @@ public static class Time_SwitchHooks {
     }
 
 
+
     //---changing settings on map load---
     private static void LevelLoader_StartLevel(On.Celeste.LevelLoader.orig_StartLevel orig, LevelLoader self)
     {
@@ -109,15 +110,8 @@ public static class Time_SwitchHooks {
             Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Session.LegacyTimelines;
         }
 
-        if (Time_SwitchModule.SaveData.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveSession && Time_SwitchModule.Session.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveFile)
-        {
-            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
-        }
-
-        if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.auto)
-        {
-            DetectTimelines(self);
-        }
+        //runs everytime to be nicer to in-development maps
+        DetectTimelines(self);
     }
 
 
@@ -251,15 +245,20 @@ public static class Time_SwitchHooks {
     //returns the character used for the other timeline
     private static string TimelinePicker(string currentLevelName)
     {
+        //this is here instead of being in LevelLoader so the legacy timelines setting can be changed by the trigger
+        if (Time_SwitchModule.SaveData.defaultLegacyTimelines && Time_SwitchModule.Session.defaultLegacyTimelines)
+        {
+            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
+        }
+
         bool legacy = false;
 
-        //this is here instead of being in LevelLoader so it can be set in the trigger
         if (Time_SwitchModule.Settings.LegacyTimelines != Time_Switch.TimelineTypes.auto)
         {
             legacy = true;
         }
 
-        if (legacy && timelineStartA != "a" || legacy && timelineEndA != "a" || legacy && timelineStartB != "b" || legacy && timelineEndB != "b")
+        if (legacy)
         {
             timelineStartA = timelineEndA = "a";
             timelineStartB = timelineEndB = "b";
@@ -436,28 +435,6 @@ public static class Time_SwitchHooks {
     private static void LevelExit_Begin(On.Celeste.LevelExit.orig_Begin orig, LevelExit self)
     {
         orig(self);
-
-        //save settings
-        Time_SwitchModule.SaveData.RoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
-
-        //sets to opposite for check in levelLoader hook (honestly not sure if this logic is correct)
-        if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveFile)
-        {
-            Time_SwitchModule.SaveData.LegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
-        }
-        else
-        {
-            Time_SwitchModule.SaveData.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveSession;
-        }
-
-        if (Time_SwitchModule.Settings.LegacyTimelines == Time_Switch.TimelineTypes.legacySaveSession)
-        {
-            Time_SwitchModule.Session.LegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
-        }
-        else
-        {
-            Time_SwitchModule.Session.LegacyTimelines = Time_Switch.TimelineTypes.legacySaveFile;
-        }
 
         Time_SwitchModule.SaveData.firstLoad = false;
 
