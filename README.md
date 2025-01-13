@@ -7,7 +7,7 @@ Check the [wiki](https://github.com/WafflesRVeryNice/Time_Switch/wiki) for infor
 
 
 ## Trivia
-This mod took approximately 20.5 hours to make (recorded 20:22:29) across 5 almost consecutive days
+This mod took approximately 20.5 hours to make functional (recorded 20:22:29) across 5 almost consecutive days
 
 \+ 2:22:52 - eating a waffle to celebrate and writing comments & credits
 
@@ -15,6 +15,7 @@ This mod took approximately 20.5 hours to make (recorded 20:22:29) across 5 almo
 
 \+ 16:29:35 - for v1.0.0 -> v1.1.0  
 
+\+ 29:03:21 - for v1.1.0 -> v1.3.2
 
 
 ## Credits
@@ -35,14 +36,13 @@ WafflesAreNice
 \- SSM24  
 \- Dorian  
 \- Popax21  
-
-**Update:**  
 \- Wartori  
 \- gamaton celeste  
+\- Eylstar  
 
 **Special thanks to:**  
 \- Snip for helping me the most  
-\- Kalobi for making the teleport (On hook) functional  
-\- Popax21 for making my IL hook functional  
-\- Wartori for making the manual IL hook functional  
+\- Kalobi for making the teleport functional  
+\- Popax21 for making teleport correction IL hook functional  
+\- Wartori for making the manual IL hook to disable dash refill on time switch functional  
 
