@@ -15,7 +15,7 @@ This mod took approximately 20.5 hours to make functional (recorded 20:22:29) ac
 
 \+ 16:29:35 - for v1.0.0 -> v1.1.0  
 
-\+ 29:03:21 - for v1.1.0 -> v1.3.2
+\+ 32:44:45 - for v1.1.0 -> v1.3.2
 
 
 ## Credits
