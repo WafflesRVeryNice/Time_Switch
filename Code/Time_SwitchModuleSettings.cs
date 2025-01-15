@@ -30,24 +30,17 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
         menu.Add(roomNameFormatSlider);
 
-        TextMenuExt.EaseInSubHeaderExt descrText;
+        if (inGame && !Time_SwitchModule.SaveData.defaultRoomNameFormat)
+        {
+            roomNameFormatSlider.Disabled = true;
+        }
 
-        if (!inGame)
+
+        TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_Menu_{Enum.GetName(RoomNameFormat)}"), false, menu)
         {
-            descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_Menu_{Enum.GetName(RoomNameFormat)}"), false, menu)
-            {
-                TextColor = Color.Gray,
-                HeightExtra = 0f
-            };
-        }
-        else
-        {
-            descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_InGame_{Enum.GetName(RoomNameFormat)}"), false, menu)
-            {
-                TextColor = Color.Gray,
-                HeightExtra = 0f
-            };
-        }
+            TextColor = Color.Gray,
+            HeightExtra = 0f
+        };
 
         descrText.IncludeWidthInMeasurement = false;
 
@@ -56,22 +49,12 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
         roomNameFormatSlider.OnEnter += () => descrText.FadeVisible = true;
         roomNameFormatSlider.OnLeave += () => descrText.FadeVisible = false;
         roomNameFormatSlider.OnValueChange += val => {
-            if (!inGame)
-            {
-                descrText.Title = Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_Menu_{Enum.GetName((Time_Switch.FormatMode)val)}");
-            }
-            else
-            {
-                descrText.Title = Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_InGame_{Enum.GetName((Time_Switch.FormatMode)val)}");
-            }
+            descrText.Title = Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Description_Menu_{Enum.GetName((Time_Switch.FormatMode)val)}");
             menu.RecalculateSize();
         };
         //+++
     }
 
-
-    [SettingIgnore]
-    public bool DisableRoomNameFormatInSettings { get; set; } = false; //TODO implement
 
 
     //---setting for automatic room name format detection---
@@ -80,34 +63,36 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
     public void CreateLegacyTimelinesEntry(TextMenu menu, bool inGame)
     {
-        if (!inGame)
-        {
-            TextMenu.Slider TimelineTypeSlider = new TextMenu.Slider(label: Dialog.Clean("Time_Switch_Setting_LegacyTimelines_Name"),
+        TextMenu.Slider TimelineTypeSlider = new TextMenu.Slider(label: Dialog.Clean("Time_Switch_Setting_LegacyTimelines_Name"),
             i => Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Option_{Enum.GetName((Time_Switch.TimelineTypes)i)}"),
             0, Enum.GetValues<Time_Switch.TimelineTypes>().Length - 1, (int)LegacyTimelines);
 
-            TimelineTypeSlider.OnValueChange += val => LegacyTimelines = (Time_Switch.TimelineTypes)val;
+        TimelineTypeSlider.OnValueChange += val => LegacyTimelines = (Time_Switch.TimelineTypes)val;
 
-            menu.Add(TimelineTypeSlider);
+        menu.Add(TimelineTypeSlider);
 
-
-            TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Description_{Enum.GetName(LegacyTimelines)}"), false, menu)
-            {
-                TextColor = Color.Gray,
-                HeightExtra = 0f
-            };
-
-            descrText.IncludeWidthInMeasurement = false;
-
-            menu.Insert(menu.Items.IndexOf(TimelineTypeSlider) + 1, descrText);
-
-            TimelineTypeSlider.OnEnter += () => descrText.FadeVisible = true;
-            TimelineTypeSlider.OnLeave += () => descrText.FadeVisible = false;
-            TimelineTypeSlider.OnValueChange += val => {
-                descrText.Title = Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Description_{Enum.GetName((Time_Switch.TimelineTypes)val)}");
-                menu.RecalculateSize();
-            };
+        if (inGame)
+        {
+            TimelineTypeSlider.Disabled = true;
         }
+
+
+        TextMenuExt.EaseInSubHeaderExt descrText = new TextMenuExt.EaseInSubHeaderExt(Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Description_{Enum.GetName(LegacyTimelines)}"), false, menu)
+        {
+            TextColor = Color.Gray,
+            HeightExtra = 0f
+        };
+
+        descrText.IncludeWidthInMeasurement = false;
+
+        menu.Insert(menu.Items.IndexOf(TimelineTypeSlider) + 1, descrText);
+
+        TimelineTypeSlider.OnEnter += () => descrText.FadeVisible = true;
+        TimelineTypeSlider.OnLeave += () => descrText.FadeVisible = false;
+        TimelineTypeSlider.OnValueChange += val => {
+            descrText.Title = Dialog.Clean($"Time_Switch_Setting_LegacyTimelines_Description_{Enum.GetName((Time_Switch.TimelineTypes)val)}");
+            menu.RecalculateSize();
+        };
     }
 
     //---

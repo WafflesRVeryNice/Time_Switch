@@ -54,7 +54,7 @@ TimeSwitchControlTrigger.fieldInformation = {
         options = {
 			["OnPlayerEnter"] = 1,
             ["OnPlayerLeave"] = 2,
-            ["OnLevelStart"] = 3,
+            ["OnRoomLoad"] = 3,
 		},
         editable = false
     }

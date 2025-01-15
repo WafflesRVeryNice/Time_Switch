@@ -90,6 +90,17 @@ public class TimeSwitchControlTrigger : Trigger
 
     private void Trigger()
     {
+        //save user settings
+        if (Time_SwitchModule.SaveData.defaultRoomNameFormat == true)
+        {
+            Time_SwitchModule.Settings.userRoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
+        }
+        if (Time_SwitchModule.SaveData.defaultLegacyTimelines == true && Time_SwitchModule.Session.defaultLegacyTimelines == true)
+        {
+            Time_SwitchModule.Settings.userLegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
+        }
+        
+
         if (RoomNameFormatOption == 1)
         {
             //does nothing

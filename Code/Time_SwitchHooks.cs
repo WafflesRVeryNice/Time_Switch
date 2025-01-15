@@ -78,7 +78,7 @@ public static class Time_SwitchHooks {
     {
         orig(self);
 
-        //save user settings
+        //save user settings - redundant unless user accessiblility for settings or trigger code is changed
         Time_SwitchModule.Settings.userRoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
         Time_SwitchModule.Settings.userLegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines;
 
@@ -439,8 +439,23 @@ public static class Time_SwitchHooks {
         Time_SwitchModule.SaveData.firstLoad = false;
 
         //reapply user settings
-        Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.Settings.userRoomNameFormat;
-        Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
+        if (!Time_SwitchModule.SaveData.defaultRoomNameFormat)
+        {
+            Time_SwitchModule.Settings.RoomNameFormat = Time_SwitchModule.Settings.userRoomNameFormat;
+        }
+        else
+        {
+            Time_SwitchModule.Settings.userRoomNameFormat = Time_SwitchModule.Settings.RoomNameFormat;
+        }
+
+        if (!Time_SwitchModule.SaveData.defaultLegacyTimelines && !Time_SwitchModule.Session.defaultLegacyTimelines)
+        {
+            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
+        }
+        else if (Time_SwitchModule.SaveData.defaultLegacyTimelines && Time_SwitchModule.Session.defaultLegacyTimelines)
+        {
+            Time_SwitchModule.Settings.userLegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines; //redundant unless user accessiblility for setting is changed
+        }
     }
 
     //---
