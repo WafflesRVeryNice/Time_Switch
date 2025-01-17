@@ -1,5 +1,3 @@
-local enums = require("consts.celeste_enums")
-
 local TimeSwitchControlTrigger = {}
 
 
@@ -11,8 +9,7 @@ TimeSwitchControlTrigger.placements = {
         RoomNameFormat = 1,
 		Activate = 1,
 		Timelines = 1,
-		onlyOnce = true,
-		coversScreen = false
+		onlyOnce = true
     }
 }
 
@@ -24,8 +21,7 @@ TimeSwitchControlTrigger.fieldOrder = {
 	"RoomNameFormat",
 	"Activate",
 	"Timelines",
-	"onlyOnce",
-	"coversScreen"
+	"onlyOnce"
 }
 
 TimeSwitchControlTrigger.fieldInformation = { 

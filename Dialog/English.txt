@@ -31,8 +31,6 @@ Time_Switch_Setting_RoomNameFormat_Description_InGame_Format2=
 map setting - may break map
 uses format (identifier)(name)(timeline)
 
-Time_Switch_Setting_RoomNameFormat_Name_Disabled= Setting Disabled
-
 
 # Timeline Type selection (legacy timelines)
 Time_Switch_Setting_LegacyTimelines_Name= Timelines

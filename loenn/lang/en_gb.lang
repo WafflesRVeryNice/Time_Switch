@@ -7,3 +7,11 @@ triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.onlyOnce= W
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.coversScreen= Makes the trigger the size of the room
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.Timelines= Legacy timelines use "a" and "b", required for maps with multiple room name formats \nTurning this off again will only take effect next time the map loads \nNo Change - timeline type will not be changed \nAutomatic Detection - Detects Timeline characters used \nSave to Savefile - Legacy will be used in all maps in this savefile unless turned off \nSave to Session - Legacy will revert when player exits map (excluding save & quit)
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.Activate= When this trigger should activate
+
+
+# Switch Timeline Trigger (forces time switch)
+triggers.Time_Switch/SwitchTimelineTrigger.placements.name.Switch_Timeline= Switch Timeline
+
+# descriptions
+triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again)
+triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.Activate= When this trigger should activate

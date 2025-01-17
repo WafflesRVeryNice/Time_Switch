@@ -13,6 +13,7 @@ using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using static Celeste.Mod.Time_Switch.Time_SwitchModuleSettings;
 using Celeste.Mod.Entities;
+using static Celeste.Mod.Time_Switch.Time_Switch;
 
 
 namespace Celeste.Mod.Time_Switch;
@@ -25,7 +26,6 @@ public class TimeSwitchControlTrigger : Trigger
     private int RoomNameFormatOption;
     private int mode;
     private int TimelineType;
-    private bool coversScreen;
     private bool onlyOnce;
 
     public TimeSwitchControlTrigger(EntityData data, Vector2 offset, EntityID id) : base(data, offset) 
@@ -34,27 +34,8 @@ public class TimeSwitchControlTrigger : Trigger
         RoomNameFormatOption = data.Int("RoomNameFormat");
         mode = data.Int("Activate");
         TimelineType = data.Int("Timelines");
-        coversScreen = data.Bool("coversScreen", false);
         onlyOnce = data.Bool("onlyOnce", true);
     }
-
-
-
-    //+++solution from extended variant mode+++ https://github.com/maddie480/ExtendedVariantMode/blob/07e7f2e48cec484613a414bb2dd6aa6e87775db9/Entities/ForMappers/AbstractExtendedVariantTrigger.cs#L69
-    public override void Added(Scene scene)
-    {
-        base.Added(scene);
-
-        Rectangle bounds = (scene as Level).Bounds;
-
-        if (coversScreen)
-        {
-            Position = new Vector2(bounds.X, bounds.Y - 24f);
-            Collider.Width = bounds.Width;
-            Collider.Height = bounds.Height + 32f;
-        }
-    }
-    //+++
     
 
 
@@ -124,11 +105,6 @@ public class TimeSwitchControlTrigger : Trigger
             Time_SwitchModule.SaveData.defaultRoomNameFormat = false;
         }
 
-        if (onlyOnce)
-        {
-            RemoveSelf();
-            SceneAs<Level>().Session.DoNotLoad.Add(ID);
-        }
 
         if (TimelineType == 1)
         {
@@ -158,6 +134,71 @@ public class TimeSwitchControlTrigger : Trigger
             Time_SwitchModule.SaveData.defaultLegacyTimelines = false;
             Time_SwitchModule.Session.defaultLegacyTimelines = false;
         }
+
+        if (onlyOnce)
+        {
+            RemoveSelf();
+            SceneAs<Level>().Session.DoNotLoad.Add(ID);
+        }
     }
 }
 
+[CustomEntity("Time_Switch/SwitchTimelineTrigger")]
+public class SwitchTimelineTrigger : Trigger
+{
+    private EntityID ID;
+    private int mode;
+    private bool onlyOnce;
+
+    public SwitchTimelineTrigger(EntityData data, Vector2 offset, EntityID id) : base(data, offset)
+    {
+        ID = id;
+        mode = data.Int("Activate");
+        onlyOnce = data.Bool("onlyOnce", true);
+    }
+
+
+
+    public override void OnEnter(Player player)
+    {
+        base.OnEnter(player);
+
+        if (mode == 1)
+        {
+            Trigger();
+        }
+    }
+
+    public override void OnLeave(Player player)
+    {
+        base.OnLeave(player);
+
+        if (mode == 2)
+        {
+            Trigger();
+        }
+    }
+
+    public override void Awake(Scene scene)
+    {
+        base.Awake(scene);
+
+        if (mode == 3)
+        {
+            Trigger();
+        }
+    }
+
+
+
+    private void Trigger()
+    {
+        Time_SwitchModule.Session.forceTimeSwitch = true;
+
+        if (onlyOnce)
+        {
+            RemoveSelf();
+            SceneAs<Level>().Session.DoNotLoad.Add(ID);
+        }
+    }
+}

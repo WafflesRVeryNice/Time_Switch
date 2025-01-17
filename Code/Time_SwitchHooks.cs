@@ -42,7 +42,7 @@ public static class Time_SwitchHooks {
     private static Vector2 nextPlayerPosAbsolute;
 
     //used to activate/deactivate the IL hooks
-    private static bool correctionILsActive;
+    private static bool correctionILsActive = false;
 
     //creates var for manual IL hook
     private static ILHook CancelDashRefillHook;
@@ -179,9 +179,12 @@ public static class Time_SwitchHooks {
         //calls Update
         orig(self);
 
-        if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
+        if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed
+            || Time_SwitchModule.Session.forceTimeSwitch == true)
         {
             Logger.Log(LogLevel.Verbose, "Time Switch", "Teleport triggered");
+
+            Time_SwitchModule.Session.forceTimeSwitch = false;
 
             //activates ILs
             correctionILsActive = true;
@@ -189,10 +192,6 @@ public static class Time_SwitchHooks {
             TeleportPlayer(self);
 
             Time_SwitchModule.Settings.TimeSwitchBind.ConsumePress();
-        }
-        else
-        {
-            correctionILsActive = false; //TODO check if necessary
         }
     }
 
