@@ -5,6 +5,8 @@ The mod works by teleporting the player between 2 rooms based on the rooms' name
 
 Check the [wiki](https://github.com/WafflesRVeryNice/Time_Switch/wiki) for information on how to use the mod
 
+If you find any issues with this mod please tell me about it, you can: DM me on discord (wafflesarenice), @ me in the celeste server (@WafflesAreNice) or open an issue 
+
 
 ## Trivia
 This mod took approximately 20.5 hours to make functional (recorded 20:22:29) across 5 almost consecutive days
@@ -17,6 +19,8 @@ This mod took approximately 20.5 hours to make functional (recorded 20:22:29) ac
 
 \+ 32:44:45 - for v1.1.0 -> v1.3.2
 
+[25:57:21 +]: #
+Total Time: 79h 31m 57s (not 100% accurate)
 
 ## Credits
 
