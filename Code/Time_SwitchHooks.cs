@@ -49,6 +49,9 @@ public static class Time_SwitchHooks {
 
     private static bool popupShown = false;
 
+    private static bool TimelineDetectionFormat1Fail = false;
+    private static bool TimelineDetectionFormat2Fail = false;
+
     //---
 
 
@@ -143,17 +146,30 @@ public static class Time_SwitchHooks {
             timelineStartA = mostCommonFirstChars[0].ToString();
             timelineStartB = mostCommonFirstChars[1].ToString();
         }
+        else
+        {
+            TimelineDetectionFormat1Fail = true;
+        }
         if (mostCommonLastChars.Count == 2)
         {
             timelineEndA = mostCommonLastChars[0].ToString();
             timelineEndB = mostCommonLastChars[1].ToString();
         }
+        else
+        {
+            TimelineDetectionFormat2Fail = true;
+        }
+
+        if (TimelineDetectionFormat1Fail && TimelineDetectionFormat2Fail)
+        {
+            Logger.Log(LogLevel.Warn, "Time Switch", "Timeline detection failed for both room name formats");
+        }
 
         if (mostCommonFirstChars.Count != 2 && Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1
             || mostCommonLastChars.Count != 2 && Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
         {
-            Logger.Log(LogLevel.Error, "Time Switch", $"The room name format setting is set to {Time_SwitchModule.Settings.RoomNameFormat} - "
-                + Dialog.Clean($"Setting_RoomNameFormat_Option_{Enum.GetName(Time_SwitchModule.Settings.RoomNameFormat)}")
+            Logger.Log(LogLevel.Warn, "Time Switch", $"The room name format setting is set to {Time_SwitchModule.Settings.RoomNameFormat} - "
+                + Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Option_{Enum.GetName(Time_SwitchModule.Settings.RoomNameFormat)}")
                 + " which doesn't match the timeline position in the map's room names or number of timelines");
         }
     }
@@ -280,7 +296,7 @@ public static class Time_SwitchHooks {
             timelineStartB = timelineEndB = "b";
         }
 
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1)
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1 && !TimelineDetectionFormat1Fail)
         {
             if (RoomDisabled(currentLevelName))
             {
@@ -296,8 +312,9 @@ public static class Time_SwitchHooks {
             }
             return null;
         }
+        
 
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && !TimelineDetectionFormat2Fail)
         {
             if (RoomDisabled(currentLevelName))
             {
@@ -312,6 +329,12 @@ public static class Time_SwitchHooks {
                 return timelineEndA;
             }
             return null;
+        }
+
+        if (TimelineDetectionFormat1Fail || TimelineDetectionFormat2Fail)
+        {
+            Logger.Log(LogLevel.Error, "Time Switch", $"Timeline check failed - automatic detection could not assign the timeline values for {Time_SwitchModule.Settings.RoomNameFormat} - "
+                + Dialog.Clean($"Time_Switch_Setting_RoomNameFormat_Option_{Enum.GetName(Time_SwitchModule.Settings.RoomNameFormat)}"));
         }
 
         return null;
