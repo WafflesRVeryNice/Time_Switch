@@ -192,6 +192,8 @@ public static class Time_SwitchHooks {
             TeleportPlayer(self);
 
             Time_SwitchModule.Settings.TimeSwitchBind.ConsumePress();
+
+            Tooltip.Show("Teleported");
         }
     }
 
