@@ -47,6 +47,8 @@ public static class Time_SwitchHooks {
     //creates var for manual IL hook
     private static ILHook CancelDashRefillHook;
 
+    private static bool popupShown = false;
+
     //---
 
 
@@ -158,7 +160,7 @@ public static class Time_SwitchHooks {
 
 
 
-    //+++returns most common characters+++ stollen from https://stackoverflow.com/a/16850071
+    //+++returns most common characters+++ stolen from https://stackoverflow.com/a/16850071
     internal static IEnumerable<T> FindModes<T>(this IEnumerable<T> input)
     {
         var list = input.ToLookup(x => x);
@@ -179,6 +181,8 @@ public static class Time_SwitchHooks {
         //calls Update
         orig(self);
 
+        popupShown = false;
+
         if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed
             || Time_SwitchModule.Session.forceTimeSwitch == true)
         {
@@ -192,8 +196,11 @@ public static class Time_SwitchHooks {
             TeleportPlayer(self);
 
             Time_SwitchModule.Settings.TimeSwitchBind.ConsumePress();
-
-            Tooltip.Show("Teleported");
+        }
+        else if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
+        {
+            Popup.Show("You can't time travel");
+            popupShown = true;
         }
     }
 
@@ -222,8 +229,16 @@ public static class Time_SwitchHooks {
 
         string currentLevelIdentifier = FetchCurrentLevelIdentifier(currentLevelName);
 
-        //finds room on the other timeline with the same identifier
-        FindNextLevel(level, nextLevelTimeline, currentLevelIdentifier); //TODO add if to check for nulls + error message
+        if (nextLevelTimeline != null && currentLevelIdentifier != null)
+        {
+            //finds room on the other timeline with the same identifier
+            FindNextLevel(level, nextLevelTimeline, currentLevelIdentifier);
+        }
+        else
+        {
+            nextLevelName = null;
+            nextLevelPos = null;
+        }
 
         if (nextLevelName != null && nextLevelPos != null)
         {
@@ -237,11 +252,18 @@ public static class Time_SwitchHooks {
         }
         else
         {
-            Logger.Log(LogLevel.Error, "Time Switch", "Time Switch failed - Did not find a room to teleport to, check that your rooms are named correctly and that you are using the correct format setting");
+            if (!popupShown)
+            {
+                Popup.Show("Time Switch Failed");
+            }
+
+            Logger.Log(LogLevel.Error, "Time Switch", "Time Switch failed - Did not find a room to teleport to");
 
             correctionILsActive = false;
         }
     }
+
+
 
     //returns the character used for the other timeline
     private static string TimelinePicker(string currentLevelName)
@@ -252,14 +274,7 @@ public static class Time_SwitchHooks {
             Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
         }
 
-        bool legacy = false;
-
         if (Time_SwitchModule.Settings.LegacyTimelines != Time_Switch.TimelineTypes.auto)
-        {
-            legacy = true;
-        }
-
-        if (legacy)
         {
             timelineStartA = timelineEndA = "a";
             timelineStartB = timelineEndB = "b";
@@ -267,7 +282,11 @@ public static class Time_SwitchHooks {
 
         if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1)
         {
-            if (currentLevelName.StartsWith(timelineStartA))
+            if (RoomDisabled(currentLevelName))
+            {
+                return null;
+            }
+            else if (currentLevelName.StartsWith(timelineStartA))
             {
                 return timelineStartB;
             }
@@ -280,6 +299,10 @@ public static class Time_SwitchHooks {
 
         if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2)
         {
+            if (RoomDisabled(currentLevelName))
+            {
+                return null;
+            }
             if (currentLevelName.EndsWith(timelineEndA))
             {
                 return timelineEndB;
@@ -295,6 +318,23 @@ public static class Time_SwitchHooks {
     }
 
 
+
+    private static bool RoomDisabled(string currentLevelName)
+    {
+        if (currentLevelName.StartsWith("_") || currentLevelName.StartsWith("-"))
+        {
+            Popup.Show("You can't time travel in this room");
+            popupShown = true;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+
     private static string FetchCurrentLevelIdentifier(string currentLevelName)
     {
         if (currentLevelName.Length >= 3)
@@ -308,7 +348,7 @@ public static class Time_SwitchHooks {
             }
             else if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && !(currentLevelName.Length >= 4))
             {
-                Logger.Log(LogLevel.Error, "Time Switch", "room name is too short for format 2 - clean, attempting to use format 1 - simple");
+                Logger.Log(LogLevel.Error, "Time Switch", "room name is too short for format 2 - clean, attempting to use format 1 - simple identifier");
             }
 
             string currentLevelNumberDigit1 = currentLevelName[1].ToString();
@@ -355,7 +395,6 @@ public static class Time_SwitchHooks {
         else
         {
             nextLevelName = null;
-
             nextLevelPos = null;
         }
     }

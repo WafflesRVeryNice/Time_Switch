@@ -21,8 +21,8 @@ using System.Linq;
 namespace Celeste.Mod.Time_Switch;
 
 
-//+++Stollen from Speedrun tool+++ https://github.com/DemoJameson/Celeste.SpeedrunTool/blob/master/SpeedrunTool/Source/Message/Tooltip.cs#L55
-public class Tooltip : Entity
+//+++Stolen from Speedrun tool+++ https://github.com/DemoJameson/Celeste.SpeedrunTool/blob/master/SpeedrunTool/Source/Message/Tooltip.cs#L55
+public class Popup : Entity
 {
     private const int Padding = 25;
     private readonly string message;
@@ -30,17 +30,17 @@ public class Tooltip : Entity
     private float unEasedAlpha;
     private readonly float duration;
 
-    private Tooltip(string message, float duration = 1f)
+    private Popup(string message, float duration = 1f)
     {
         this.message = message;
         this.duration = duration;
         Vector2 messageSize = ActiveFont.Measure(message);
         Position = new(Padding, Engine.Height - messageSize.Y - Padding / 2f);
         Tag = Tags.HUD | Tags.Global | Tags.FrozenUpdate | Tags.PauseUpdate | Tags.TransitionUpdate;
-        Add(new Coroutine(Show()));
+        Add(new Coroutine(FadeIn()));
     }
 
-    private IEnumerator Show()
+    private IEnumerator FadeIn()
     {
         while (alpha < 1f)
         {
@@ -49,10 +49,10 @@ public class Tooltip : Entity
             yield return null;
         }
 
-        yield return Dismiss();
+        yield return FadeOut();
     }
 
-    private IEnumerator Dismiss()
+    private IEnumerator FadeOut()
     {
         yield return duration;
         while (alpha > 0f)
@@ -76,12 +76,12 @@ public class Tooltip : Entity
     {
         if (Engine.Scene is { } scene)
         {
-            if (!scene.Tracker.Entities.TryGetValue(typeof(Tooltip), out var tooltips))
+            if (!scene.Tracker.Entities.TryGetValue(typeof(Popup), out var tooltips))
             {
-                tooltips = scene.Entities.FindAll<Tooltip>().Cast<Entity>().ToList();
+                tooltips = scene.Entities.FindAll<Popup>().Cast<Entity>().ToList();
             }
             tooltips.ForEach(entity => entity.RemoveSelf());
-            scene.Add(new Tooltip(message, duration));
+            scene.Add(new Popup(message, duration));
         }
     }
 }
