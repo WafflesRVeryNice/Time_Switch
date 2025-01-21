@@ -27,6 +27,10 @@ Total Time: 79h 31m 57s (not 100% accurate)
 **Coding:**  
 WafflesAreNice  
 
+**Uses code from:**  
+[Everest](https://github.com/EverestAPI/Everest)  
+[Speedrun Tool](https://github.com/DemoJameson/Celeste.SpeedrunTool)  
+
 **Coding help:**  
 \- Aon  
 \- Parralax  
