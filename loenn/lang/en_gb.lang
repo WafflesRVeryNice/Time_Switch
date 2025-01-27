@@ -3,7 +3,7 @@ triggers.Time_Switch/TimeSwitchControlTrigger.placements.name.Time_Switch_Contro
 
 # descriptions
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.RoomNameFormat= No Change - time switch setting will not be changed \nOff - turns off time switch \nSimple - sets the format to (timeline)(identifier)(name) \nClean - sets the format to (identifier)(name)(timeline)
-triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again)
+triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again, doesn't include F5 reload)
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.coversScreen= Makes the trigger the size of the room
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.Timelines= Legacy timelines use "a" and "b", required for maps with multiple room name formats \nTurning this off again will only take effect next time the map loads \nNo Change - timeline type will not be changed \nAutomatic Detection - Detects Timeline characters used \nSave to Savefile - Legacy will be used in all maps in this savefile unless turned off \nSave to Session - Legacy will revert when player exits map (excluding save & quit)
 triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.Activate= When this trigger should activate
@@ -13,8 +13,13 @@ triggers.Time_Switch/TimeSwitchControlTrigger.attributes.description.Activate= W
 triggers.Time_Switch/SwitchTimelineTrigger.placements.name.Switch_Timeline= Switch Timeline
 
 # descriptions
-triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again)
+triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again, doesn't include F5 reload)
 triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.Activate= When this trigger should activate
 
 # Disable Keybind / Player Input Trigger
 triggers.Time_Switch/DisableInputTrigger.placements.name.Disable_Input= Disable Player Input
+
+# descriptions
+triggers.Time_Switch/DisableInputTrigger.attributes.description.PlayerInput= When disabled the player cannot use time switch but time switch can be activated using the Switch Timeline trigger\nWhen enabled the player can use time switch and time switch can be activated using the Switch Timeline trigger (default)
+triggers.Time_Switch/DisableInputTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again, doesn't include F5 reload)
+triggers.Time_Switch/DisableInputTrigger.attributes.description.Activate= When this trigger should activate
