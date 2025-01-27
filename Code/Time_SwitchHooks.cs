@@ -215,7 +215,7 @@ public static class Time_SwitchHooks {
         }
         else if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
-            Popup.Show("You can't time travel");
+            Popup.Show("You can't time switch here");
             popupShown = true;
         }
     }
@@ -346,7 +346,7 @@ public static class Time_SwitchHooks {
     {
         if (currentLevelName.StartsWith("_") || currentLevelName.StartsWith("-"))
         {
-            Popup.Show("You can't time travel in this room");
+            Popup.Show("You can't time switch in this room");
             popupShown = true;
             return true;
         }
