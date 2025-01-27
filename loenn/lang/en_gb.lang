@@ -15,3 +15,6 @@ triggers.Time_Switch/SwitchTimelineTrigger.placements.name.Switch_Timeline= Swit
 # descriptions
 triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.onlyOnce= Will only activate once (resets on loading the map again)
 triggers.Time_Switch/SwitchTimelineTrigger.attributes.description.Activate= When this trigger should activate
+
+# Disable Keybind / Player Input Trigger
+triggers.Time_Switch/DisableInputTrigger.placements.name.Disable_Input= Disable Player Input

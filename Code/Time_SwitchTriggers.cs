@@ -143,6 +143,8 @@ public class TimeSwitchControlTrigger : Trigger
     }
 }
 
+
+
 [CustomEntity("Time_Switch/SwitchTimelineTrigger")]
 public class SwitchTimelineTrigger : Trigger
 {
@@ -156,7 +158,6 @@ public class SwitchTimelineTrigger : Trigger
         mode = data.Int("Activate");
         onlyOnce = data.Bool("onlyOnce", true);
     }
-
 
 
     public override void OnEnter(Player player)
@@ -190,10 +191,80 @@ public class SwitchTimelineTrigger : Trigger
     }
 
 
-
     private void Trigger()
     {
         Time_SwitchModule.Session.forceTimeSwitch = true;
+
+        if (onlyOnce)
+        {
+            RemoveSelf();
+            SceneAs<Level>().Session.DoNotLoad.Add(ID);
+        }
+    }
+}
+
+
+
+[CustomEntity("Time_Switch/DisableInputTrigger")]
+public class DisableInputTrigger : Trigger
+{
+    private EntityID ID;
+    private int mode;
+    private bool onlyOnce;
+    private int input;
+
+    public DisableInputTrigger(EntityData data, Vector2 offset, EntityID id) : base(data, offset)
+    {
+        ID = id;
+        mode = data.Int("Activate");
+        onlyOnce = data.Bool("onlyOnce", true);
+        input = data.Int("PlayerInput");
+    }
+
+
+    public override void OnEnter(Player player)
+    {
+        base.OnEnter(player);
+
+        if (mode == 1)
+        {
+            Trigger();
+        }
+    }
+
+    public override void OnLeave(Player player)
+    {
+        base.OnLeave(player);
+
+        if (mode == 2)
+        {
+            Trigger();
+        }
+    }
+
+    public override void Awake(Scene scene)
+    {
+        base.Awake(scene);
+
+        if (mode == 3)
+        {
+            Trigger();
+        }
+    }
+
+
+    private void Trigger()
+    {
+        if (input == 1)
+        {
+            Time_SwitchModule.Settings.DisableKeyBind = true;
+            Time_SwitchModule.Session.disableKeybind = true;
+        }
+        else
+        {
+            Time_SwitchModule.Settings.DisableKeyBind = false;
+            Time_SwitchModule.Session.disableKeybind = false;
+        }
 
         if (onlyOnce)
         {

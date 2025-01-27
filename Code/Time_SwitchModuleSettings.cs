@@ -99,7 +99,7 @@ public class Time_SwitchModuleSettings : EverestModuleSettings
 
 
     [SettingIgnore]
-    public bool DisableKeyBind { get; set; } = false; //TODO implement
+    public bool DisableKeyBind { get; set; } = false;
 
 
     //settings to save user settings incase they are overriden by map

@@ -7,4 +7,6 @@ public class Time_SwitchModuleSession : EverestModuleSession
     internal bool defaultLegacyTimelines = true;
 
     internal bool forceTimeSwitch = false; //TODO? make a custom component
+
+    internal bool? disableKeybind = null;
 }

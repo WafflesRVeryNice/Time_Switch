@@ -117,6 +117,11 @@ public static class Time_SwitchHooks {
 
         //runs everytime to be nicer to in-development maps
         DetectTimelines(self);
+
+        if (Time_SwitchModule.Session.disableKeybind != default)
+        {
+            Time_SwitchModule.Settings.DisableKeyBind = (bool)Time_SwitchModule.Session.disableKeybind;
+        }
     }
 
 
@@ -199,8 +204,9 @@ public static class Time_SwitchHooks {
 
         popupShown = false;
 
-        if (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed
-            || Time_SwitchModule.Session.forceTimeSwitch == true)
+        bool inputValid = (Time_SwitchModule.Settings.RoomNameFormat != Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed) ? true : false;
+
+        if (inputValid && !Time_SwitchModule.Settings.DisableKeyBind || Time_SwitchModule.Session.forceTimeSwitch == true)
         {
             Logger.Log(LogLevel.Verbose, "Time Switch", "Teleport triggered");
 
@@ -215,7 +221,12 @@ public static class Time_SwitchHooks {
         }
         else if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.off && self.InControl && Time_SwitchModule.Settings.TimeSwitchBind.Pressed)
         {
-            Popup.Show("You can't time switch here");
+            Popup.Show("You can't time switch");
+            popupShown = true;
+        }
+        else if (inputValid && Time_SwitchModule.Settings.DisableKeyBind)
+        {
+            Popup.Show("You don't have control of time switch");
             popupShown = true;
         }
     }
@@ -284,19 +295,18 @@ public static class Time_SwitchHooks {
     //returns the character used for the other timeline
     private static string TimelinePicker(string currentLevelName)
     {
-        //this is here instead of being in LevelLoader so the legacy timelines setting can be changed by the trigger
-        if (Time_SwitchModule.SaveData.defaultLegacyTimelines && Time_SwitchModule.Session.defaultLegacyTimelines)
-        {
-            Time_SwitchModule.Settings.LegacyTimelines = Time_SwitchModule.Settings.userLegacyTimelines;
-        }
-
+        bool legacyActive = false;
         if (Time_SwitchModule.Settings.LegacyTimelines != Time_Switch.TimelineTypes.auto)
         {
             timelineStartA = timelineEndA = "a";
             timelineStartB = timelineEndB = "b";
+
+            legacyActive = true;
         }
 
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1 && !TimelineDetectionFormat1Fail)
+
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1 && legacyActive
+            || Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format1 && !TimelineDetectionFormat1Fail)
         {
             if (RoomDisabled(currentLevelName))
             {
@@ -314,7 +324,8 @@ public static class Time_SwitchHooks {
         }
         
 
-        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && !TimelineDetectionFormat2Fail)
+        if (Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && legacyActive
+            || Time_SwitchModule.Settings.RoomNameFormat == Time_Switch.FormatMode.Format2 && !TimelineDetectionFormat2Fail)
         {
             if (RoomDisabled(currentLevelName))
             {
@@ -330,6 +341,7 @@ public static class Time_SwitchHooks {
             }
             return null;
         }
+
 
         if (TimelineDetectionFormat1Fail || TimelineDetectionFormat2Fail)
         {
@@ -518,6 +530,11 @@ public static class Time_SwitchHooks {
         else if (Time_SwitchModule.SaveData.defaultLegacyTimelines && Time_SwitchModule.Session.defaultLegacyTimelines)
         {
             Time_SwitchModule.Settings.userLegacyTimelines = Time_SwitchModule.Settings.LegacyTimelines; //redundant unless user accessiblility for setting is changed
+        }
+
+        if (Time_SwitchModule.Session.disableKeybind != default)
+        {
+            Time_SwitchModule.Settings.DisableKeyBind = default;
         }
     }
 
