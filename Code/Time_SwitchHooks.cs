@@ -241,6 +241,8 @@ public static class Time_SwitchHooks {
 
         Player player = level.Tracker.GetEntity<Player>();
 
+        Camera camera = level.Camera;
+
         //position in world space
         Vector2 playerPosition = player.Position;
 
@@ -273,9 +275,16 @@ public static class Time_SwitchHooks {
             //gets player position to teleport to in world space
             nextPlayerPosAbsolute = new Vector2(pos.X + playerPosRelativeToLevel.X, pos.Y + playerPosRelativeToLevel.Y);
 
+            //sets camera position to what it was in the previous room
+            Vector2 cameraPos = camera.Position;
+            Vector2 cameraPosRelativeToLevel = new Vector2(cameraPos.X - currentLevelPos.X, cameraPos.Y - currentLevelPos.Y);
+            Vector2 cameraPosAbsolute = new Vector2(pos.X + cameraPosRelativeToLevel.X, pos.Y + cameraPosRelativeToLevel.Y);
+
             //at the end of the frame it teleports the player to the new room with the new player position
             //note: the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
             level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
+
+            level.OnEndOfFrame += () => { camera.Position = cameraPosAbsolute; };
         }
         else
         {
@@ -288,6 +297,11 @@ public static class Time_SwitchHooks {
 
             correctionILsActive = false;
         }
+    }
+
+    private static void Level_OnEndOfFrame()
+    {
+        throw new NotImplementedException();
     }
 
 
