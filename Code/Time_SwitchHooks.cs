@@ -280,11 +280,15 @@ public static class Time_SwitchHooks {
             Vector2 cameraPosRelativeToLevel = new Vector2(cameraPos.X - currentLevelPos.X, cameraPos.Y - currentLevelPos.Y);
             Vector2 cameraPosAbsolute = new Vector2(pos.X + cameraPosRelativeToLevel.X, pos.Y + cameraPosRelativeToLevel.Y);
 
+            Facings facing = player.Facing;
+
             //at the end of the frame it teleports the player to the new room with the new player position
             //note: the intro type must be Transition otherwise TeleportTo uses different code which spawns the player differently and skips the IL hooked code
             level.OnEndOfFrame += () => { level.TeleportTo(self, nextLevelName, Player.IntroTypes.Transition, nextPlayerPosAbsolute); };
 
             level.OnEndOfFrame += () => { camera.Position = cameraPosAbsolute; };
+
+            level.OnEndOfFrame += () => { player.Facing = facing; };
         }
         else
         {
