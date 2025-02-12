@@ -43,6 +43,8 @@ WafflesAreNice
 ## Trivia
 This mod took approximately 20.5 hours to make functional (recorded 20:22:29) across 5 almost consecutive days
 
+20:22:29 - functional
+
 \+ 2:22:52 - eating a waffle to celebrate and writing comments & credits
 
 \+ 3:12:00 approx - adding manual IL hook to stop player's dash resetting when teleporting
@@ -51,6 +53,8 @@ This mod took approximately 20.5 hours to make functional (recorded 20:22:29) ac
 
 \+ 32:44:45 - for v1.1.0 -> v1.3.2
 
+\+ 17:04:17 - for v1.3.2 -> v1.5.4 + most of the wiki
+
 [25:57:21 +]: #
-Total Time: 79h 31m 57s (not 100% accurate)  
+Total Time: 92h 15m 58s (not 100% accurate)  
 
